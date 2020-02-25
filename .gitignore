@@ -1,0 +1,33 @@
+# SilentVoid custom .gitignore
+
+test*
+docs/
+RESOURCES*
+!payload/
+DEPENDENCIES.md
+
+*.exe
+*.json
+*.sh
+*.o
+!compile_all.sh
+!clean.sh
+
+# CLion related files
+.idea
+.name
+misc.xml
+modules.xml
+vcs.xml
+*.iml
+*.cbp
+
+
+# Cmake related files
+Makefile
+staticlibs
+cmake_tests
+cmake-*
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt
