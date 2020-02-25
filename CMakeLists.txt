@@ -32,6 +32,6 @@ install(TARGETS Silent_Crypt DESTINATION bin)
 
 ### Static common libs ###
 set(ARGTABLE_SOURCES lib/src/argtable3.c)
-add_library(argtable3_creator STATIC ${ARGTABLE_SOURCES})
+add_library(argtable3 STATIC ${ARGTABLE_SOURCES})
 
-target_link_libraries(Silent_Crypt argtable3_creator pthread m)
+target_link_libraries(Silent_Crypt argtable3 pthread m)
