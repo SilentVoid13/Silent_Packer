@@ -19,7 +19,8 @@ typedef struct s_elf
     Elf64_Ehdr	*elf_header;
     Elf64_Phdr	*prog_header;
     Elf64_Shdr	*section_header;
-    int **section_data;
+    // Array of bytes for each section
+    char **section_data;
 } t_elf;
 
 

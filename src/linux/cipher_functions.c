@@ -10,16 +10,18 @@
 
 #include "log.h"
 
+uint64_t text_data_size;
+uint64_t text_entry_point;
+uint64_t cipher_key;
+
 char* get_section_name(t_elf *elf, int index) {
-    int section_string_table_entry = elf->elf_header->e_shstrndx;
-    printf("sh_name : %d\n", elf->section_header[index].sh_name);
-    return ((char *)(elf->section_data[section_string_table_entry] + elf->section_header[index].sh_name));
+    int section_string_table_index = elf->elf_header->e_shstrndx;
+    return ((char *)(elf->section_data[section_string_table_index] + elf->section_header[index].sh_name));
 }
 
 int get_section_index(t_elf *elf, char *section_name) {
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
         char *s_name = get_section_name(elf, i);
-        printf("s_name : %s\n", s_name);
         if(strcmp(section_name, s_name) == 0) {
             return i;
         }
@@ -34,18 +36,17 @@ int generate_random_key() {
     return key;
 }
 
-
-int rotate_right(uint64_t value) {
+uint64_t rotate_right(uint64_t value) {
     // https://www.geeksforgeeks.org/rotate-bits-of-an-integer/
     // https://blog.regehr.org/archives/1063
-    int n_rotations = 8;
-    int int_bits = 64;
+    uint64_t n_rotations = 8;
+    uint64_t int_bits = 64;
     return (value >> n_rotations) | (value << (int_bits - n_rotations));
 }
 
-int xor_encrypt(int *data, size_t data_size, int key) {
+int xor_encrypt(char *data, size_t data_size, uint64_t key) {
     for(int i = 0; i < (int)data_size; i++) {
-        data[i] ^= key;
+        data[i] = (char)(data[i] ^ key);
         key = rotate_right(key);
     }
 
@@ -59,16 +60,20 @@ int encrypt_data(t_elf *elf, char *cipher) {
         return -1;
     }
 
-    size_t text_data_size = elf->section_header[text_section_index].sh_size;
-    int *text_data = elf->section_data[text_section_index];
+    log_verbose("Got .text section index : %d", text_section_index);
 
-    //int entry_point_address = elf->section_header[text_section_index].sh_addr;
-    //size_t entry_point_size = text_data_size;
+    char *text_data = elf->section_data[text_section_index];
 
-    int random_key = generate_random_key();
+    // Setting global variables
+    text_data_size = elf->section_header[text_section_index].sh_size;
+    text_entry_point = elf->section_header[text_section_index].sh_addr;
+
+    log_verbose("Generating random key ...");
+    cipher_key = generate_random_key();
+    uint64_t temp_key = cipher_key;
 
     if(strcmp(cipher, "xor") == 0) {
-        xor_encrypt(text_data, text_data_size, random_key);
+        xor_encrypt(text_data, text_data_size, temp_key);
     }
 
     return 1;

@@ -14,6 +14,10 @@
 
 #include "elf_allocation.h"
 
+extern uint64_t text_data_size;
+extern uint64_t text_entry_point;
+extern uint64_t cipher_key;
+
 int encrypt_data(t_elf *elf, char *cipher);
 
 #endif //SILENT_CRYPT_CIPHER_FUNCTIONS_H

@@ -86,7 +86,7 @@ int allocate_sections_data(t_elf *elf, void *file_data, size_t file_data_size) {
 
     size_t elf_section_data_size;
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        // Section occupies no space in file
+        // Section that occupies no space in file
         if(elf->section_header[i].sh_type == SHT_NOBITS) {
             elf->section_data[i] = NULL;
         }

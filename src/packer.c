@@ -6,6 +6,8 @@
 #include "packer.h"
 #include "elf_allocation.h"
 #include "cipher_functions.h"
+#include "section_insertion.h"
+#include "write_elf.h"
 
 #include "log.h"
 
@@ -64,7 +66,25 @@ int pack_file(char *file, char *cipher, char *output) {
         return -1;
     }
 
+    log_verbose("Inserting new section in ELF ...");
+    if(insert_section(elf) == -1) {
+        log_error("Error during section insertion");
+        return -1;
+    }
 
+    char *filename;
+    if(output != NULL)
+        filename = output;
+    else
+        filename = "packed.elf";
+
+    log_verbose("Writing Packed ELF to file ...");
+    if(write_elf(elf, filename) == -1) {
+        log_error("Error during new ELF writing");
+        return -1;
+    }
+
+    log_success("File %s packed into %s !", file, filename);
 
     return 1;
 }

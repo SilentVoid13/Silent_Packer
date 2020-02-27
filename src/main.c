@@ -61,7 +61,18 @@ int main(int argc, char** argv) {
         }
 
         if(file->count > 0 && cipher->count > 0) {
-            pack_file((char *)file->filename[0], (char *)cipher->sval[0], (char *)output->filename[0]);
+            int valid = 0;
+            if(strcmp(cipher->sval[0], "xor") == 0) {
+                valid = 1;
+            }
+
+            if(valid) {
+                pack_file((char *) file->filename[0], (char *) cipher->sval[0], (char *) output->filename[0]);
+            }
+            else {
+                log_error("Wrong cipher method");
+                display_argtable_help(progname, argtable);
+            }
         }
         else {
             display_argtable_help(progname, argtable);
