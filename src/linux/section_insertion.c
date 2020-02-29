@@ -4,7 +4,9 @@
 //
 
 #include "section_insertion.h"
+#include "packing_method.h"
 #include "cipher_functions.h"
+#include "elf_functions.h"
 
 #include "log.h"
 
@@ -21,10 +23,40 @@ Elf64_Shdr new_section = {
         .sh_entsize = 0,
 };
 
-size_t loader_size;
-size_t infos_size;
-
-int create_new_section(t_elf *elf, int last_pt_load_index, int last_section_index) {
+/* Map example
+     *
+     * --------
+     * loadable1
+     * --------
+     * loadable2
+     * --------
+     * loadable3 --> last_loadable_section_index
+     * --------
+     * non_loadable1
+     * --------
+     * non_loadable2
+     * --------
+     * new_created_empty_section
+     * --------
+     *
+     * We change it to this :
+     *
+     * --------
+     * loadable1
+     * --------
+     * loadable2
+     * --------
+     * loadable3 --> last_loadable_section_index
+     * --------
+     * new_section_loadable4
+     * --------
+     * non_loadable1
+     * --------
+     * non_loadable2
+     * --------
+     *
+*/
+int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_section_index) {
     Elf64_Shdr *new_section_headers;
     char **new_section_data;
     char *loader;
@@ -52,74 +84,32 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_section_inde
     elf->section_data = new_section_data;
 
     // Set new section values
+    // sh_offset and sh_addr == end of last loadable segment since we know we will add it there
     new_section.sh_offset = elf->prog_header[last_pt_load_index].p_offset + elf->prog_header[last_pt_load_index].p_memsz;
     new_section.sh_addr = elf->prog_header[last_pt_load_index].p_vaddr + elf->prog_header[last_pt_load_index].p_memsz;
 
-    // TODO
     new_section.sh_size = loader_size;
 
-    loader = malloc(loader_size);
+    loader = patch_loader();
     if(loader == NULL) {
-        log_error("malloc() failure");
+        log_error("Error during loader patching");
         return -1;
     }
 
-    // Copy the loader asm entry point to our section data
-    memcpy(loader, loader_entry_point, loader_size);
+    // -1 because e_shnum starts at 1 / -1 because we created an empty section which doesn't count
+    size_t remaining_after_section_headers_data_size = sizeof(Elf64_Shdr) * (elf->elf_header->e_shnum - last_loadable_section_index - 1 - 1);
+    size_t remaining_after_section_headers_count = sizeof(char *) * (elf->elf_header->e_shnum - last_loadable_section_index - 1 - 1);
 
-    printf("key: %d\n", cipher_key);
+    // We move all sections after the last loadable section to + 1
+    memmove(new_section_headers + last_loadable_section_index + 2, new_section_headers + last_loadable_section_index + 1, remaining_after_section_headers_data_size);
+    // Shift all char * pointer after the last loadable section to + 1
+    memmove(new_section_data + last_loadable_section_index + 2, new_section_data + last_loadable_section_index + 1, remaining_after_section_headers_count);
 
-    // Set globals variables for asm code
-    // Variables are 8 bytes 64 bit addresses (uint64_t)
-    memcpy(loader + loader_size - CIPHER_KEY_OFFSET, &cipher_key, sizeof(uint64_t));
-    memcpy(loader + loader_size - TEXT_ENTRY_POINT_OFFSET, &text_entry_point, sizeof(uint64_t));
-    memcpy(loader + loader_size - TEXT_DATA_SIZE_OFFSET, &text_data_size, sizeof(uint64_t));
-
-    size_t a = sizeof(Elf64_Shdr) * (elf->elf_header->e_shnum - last_section_index - 2);
-    size_t b = sizeof(char *) * (elf->elf_header->e_shnum - last_section_index - 2);
-
-    // Move the last section header / last section data to the new
-    memmove(new_section_headers + last_section_index + 2, new_section_headers + last_section_index + 1, a);
-    memmove(new_section_data + last_section_index + 2, new_section_data + last_section_index + 1, b);
-
-    memcpy(new_section_headers + last_section_index + 1, &new_section, sizeof(Elf64_Shdr));
-    new_section_data[last_section_index + 1] = loader;
+    // Inserting our new loadable section after the last loadable section
+    memcpy(new_section_headers + last_loadable_section_index + 1, &new_section, sizeof(Elf64_Shdr));
+    new_section_data[last_loadable_section_index + 1] = loader;
 
     return 1;
-}
-
-int set_new_elf_entry(t_elf *elf, int last_section_index) {
-    // TODO
-    Elf64_Addr last_entry = elf->elf_header->e_entry;
-    elf->elf_header->e_entry = elf->section_header[last_section_index].sh_addr;
-    int32_t jump = last_entry - (elf->elf_header->e_entry + loader_size - infos_size);
-    memcpy(elf->section_data[last_section_index] + loader_size - (infos_size + 4), &jump, 4);
-
-    return 1;
-}
-
-int find_last_program_segment_type(t_elf *elf, unsigned int p_type) {
-    int index = -1;
-    for(int i = 0; i < elf->elf_header->e_phnum; i++) {
-        if(elf->prog_header[i].p_type == p_type) {
-            index = i;
-        }
-    }
-    return index;
-}
-
-// Find last section in memory
-int find_last_section(t_elf *elf, int last_pt_load_index) {
-    int index = -1;
-    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        Elf64_Phdr *program_header = elf->prog_header + last_pt_load_index;
-        Elf64_Shdr	*section_header = elf->section_header + i;
-
-        if(section_header->sh_addr + section_header->sh_size >= program_header->p_vaddr + program_header->p_memsz) {
-            index = i;
-        }
-    }
-    return index;
 }
 
 int set_new_pt_loader_permissions(t_elf *elf) {
@@ -132,28 +122,27 @@ int set_new_pt_loader_permissions(t_elf *elf) {
 }
 
 int insert_section(t_elf *elf) {
-    int last_pt_load_index = find_last_program_segment_type(elf, PT_LOAD);
+    int last_pt_load_index = find_last_segment_of_type(elf, PT_LOAD);
     if(last_pt_load_index == -1) {
         log_error("Couldn't find PT_LOAD segment");
         return -1;
     }
 
-    int last_section_index = find_last_section(elf, last_pt_load_index);
-    if(last_section_index == -1) {
+    int last_loadable_section_index = find_last_section(elf, last_pt_load_index);
+    if(last_loadable_section_index == -1) {
         log_error("Couldn't find the last Section index");
         return -1;
     }
 
-    if(create_new_section(elf, last_pt_load_index, last_section_index) == -1) {
+    if(create_new_section(elf, last_pt_load_index, last_loadable_section_index) == -1) {
         log_error("Error during new Section creation");
         return -1;
     }
 
     // Since we appended a new section
-    last_section_index += 1;
+    last_loadable_section_index += 1;
 
-
-    // Set new segment size with our new section
+    // Set new segment size with our new section included
     size_t new_segment_size = elf->prog_header[last_pt_load_index].p_memsz + loader_size;
     elf->prog_header[last_pt_load_index].p_memsz = new_segment_size;
     elf->prog_header[last_pt_load_index].p_filesz = new_segment_size;
@@ -162,17 +151,20 @@ int insert_section(t_elf *elf) {
     set_new_pt_loader_permissions(elf);
 
     // Add our new section as the new elf entry point
-    set_new_elf_entry(elf, last_section_index);
+    set_new_elf_entry_to_section(elf, last_loadable_section_index);
 
-    // TODO: Understand this
-    for(int i = last_section_index; i < elf->elf_header->e_shnum - 1; i++) {
+    // We shift each section offset to make it correct since we moved sections to leave space for our inserted section
+    for(int i = last_loadable_section_index; i < elf->elf_header->e_shnum - 1; i++) {
         elf->section_header[i + 1].sh_offset = elf->section_header[i].sh_offset + elf->section_header[i].sh_size;
     }
 
-    if(elf->elf_header->e_shstrndx > last_section_index) {
+    // If the section header string table is after our inserted section, we add + 1 to e_shstrndx to correct its index
+    if(elf->elf_header->e_shstrndx > last_loadable_section_index) {
         elf->elf_header->e_shstrndx += 1;
     }
 
+    // We change the offset of the start of the section header to be correct
+    // We set it at the end of the last section data == start of section headers (c.f elf structure)
     int section_count = elf->elf_header->e_shnum;
     elf->elf_header->e_shoff = elf->section_header[section_count - 1].sh_offset + elf->section_header[section_count - 1].sh_size;
 

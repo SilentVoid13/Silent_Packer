@@ -10,18 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <elf.h>
-
 #include "elf_allocation.h"
 
-#define CIPHER_KEY_OFFSET 24
-#define TEXT_ENTRY_POINT_OFFSET 16
-#define TEXT_DATA_SIZE_OFFSET 8
-
 int insert_section(t_elf *elf);
-
-extern size_t loader_size;
-extern size_t infos_size;
-extern void loader_entry_point(void);
 
 #endif //SILENT_CRYPT_SECTION_INSERTION_H

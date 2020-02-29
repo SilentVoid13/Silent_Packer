@@ -15,6 +15,6 @@
 #include <fcntl.h>
 #include <mhash.h>
 
-int pack_file(char *file, char *cipher, char *output);
+int pack_file(char *file, char *cipher, char *packing_method, char *output);
 
 #endif //SILENT_CRYPT_PACKER_H

@@ -58,7 +58,7 @@ start_unpacking:
 	popfq
 	jmp	0xFFFFFFFF
 
-; Random values here
+; Random values here, to be patched
 info_start:
 info_key:	dq	0x9999999999999999
 info_addr:	dq	0xAAAAAAAAAAAAAAAA

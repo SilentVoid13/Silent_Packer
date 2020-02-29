@@ -8,7 +8,7 @@
 #include "log.h"
 
 struct arg_lit *verb, *help, *version;
-struct arg_str *cipher;
+struct arg_str *cipher, *packing_method;
 struct arg_file *output, *file;
 struct arg_end *end;
 
@@ -25,7 +25,8 @@ int main(int argc, char** argv) {
                 version  = arg_litn("V", "version", 0, 1, "Display version info and exit"),
                 verb     = arg_litn("v", "verbose", 0, 1, "Verbose output"),
                 file     = arg_filen("f", "file", "file", 0, 1, "File to pack"),
-                cipher   = arg_strn("c", "cipher", "method", 0, 1, "Cipher method to use"),
+                cipher   = arg_strn("c", "cipher", "<xor>", 0, 1, "Cipher method to use"),
+                packing_method = arg_strn("m", "method", "<section_insertion, code_cave, silvio_infection>", 0, 1, "Method to pack the binary"),
                 output   = arg_filen("o", "output", "file", 0, 1, "Output file"),
                 end      = arg_end(20),
         };
@@ -38,6 +39,7 @@ int main(int argc, char** argv) {
         output->filename[0] = NULL;
         file->filename[0] = NULL;
         cipher->sval[0] = NULL;
+        packing_method->sval[0] = NULL;
 
         int nerrors;
         nerrors = arg_parse(argc, argv, argtable);
@@ -60,19 +62,25 @@ int main(int argc, char** argv) {
                 exit(1);
         }
 
-        if(file->count > 0 && cipher->count > 0) {
-            int valid = 0;
-            if(strcmp(cipher->sval[0], "xor") == 0) {
-                valid = 1;
-            }
-
-            if(valid) {
-                pack_file((char *) file->filename[0], (char *) cipher->sval[0], (char *) output->filename[0]);
-            }
-            else {
+        if(file->count > 0 && cipher->count > 0 && packing_method->count > 0) {
+            if(
+                    (strcmp(cipher->sval[0], "xor") != 0) &&
+                    (strcmp(cipher->sval[0], "aes") != 0)
+            ) {
                 log_error("Wrong cipher method");
                 display_argtable_help(progname, argtable);
             }
+
+            if(
+                    (strcmp(packing_method->sval[0], "silvio_infection") != 0) &&
+                    (strcmp(packing_method->sval[0], "code_cave") != 0) &&
+                    (strcmp(packing_method->sval[0], "section_insertion") != 0)
+            ) {
+                log_error("Wrong packing method");
+                display_argtable_help(progname, argtable);
+            }
+
+            pack_file((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
         }
         else {
             display_argtable_help(progname, argtable);

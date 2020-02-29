@@ -30,7 +30,7 @@ void add_zero_padding(int fd, size_t end_offset) {
 }
 
 int write_elf(t_elf *elf, char *filename) {
-    int fd = open(filename, O_CREAT | O_WRONLY, 0744); // NOLINT(hicpp-signed-bitwise)
+    int fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0755); // NOLINT(hicpp-signed-bitwise)
     if(fd < 0) {
         log_error("open() failure");
         return -1;

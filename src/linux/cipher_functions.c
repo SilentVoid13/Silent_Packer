@@ -7,27 +7,13 @@
 
 #include "cipher_functions.h"
 #include "elf_allocation.h"
+#include "elf_functions.h"
 
 #include "log.h"
 
 uint64_t text_data_size;
 uint64_t text_entry_point;
 uint64_t cipher_key;
-
-char* get_section_name(t_elf *elf, int index) {
-    int section_string_table_index = elf->elf_header->e_shstrndx;
-    return ((char *)(elf->section_data[section_string_table_index] + elf->section_header[index].sh_name));
-}
-
-int get_section_index(t_elf *elf, char *section_name) {
-    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        char *s_name = get_section_name(elf, i);
-        if(strcmp(section_name, s_name) == 0) {
-            return i;
-        }
-    }
-    return -1;
-}
 
 int generate_random_key() {
     // Note: rand() is not a really good pRNG generator but that should be ok in our case
@@ -71,9 +57,13 @@ int encrypt_data(t_elf *elf, char *cipher) {
     log_verbose("Generating random key ...");
     cipher_key = generate_random_key();
     uint64_t temp_key = cipher_key;
+    log_verbose("Random key : %d", cipher_key);
 
     if(strcmp(cipher, "xor") == 0) {
         xor_encrypt(text_data, text_data_size, temp_key);
+    }
+    else if(strcmp(cipher, "aes") == 0) {
+
     }
 
     return 1;

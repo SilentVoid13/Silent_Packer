@@ -10,6 +10,7 @@ DEPENDENCIES.md
 *.json
 *.sh
 *.o
+*.drawio
 !compile_all.sh
 !clean.sh
 

@@ -29,7 +29,7 @@ set(SOURCES src/main.c src/packer.c)
 set(UTILITIES_SOURCES src/utilities/Silent_Log/log.c)
 set(SOURCES ${SOURCES} ${UTILITIES_SOURCES})
 
-set(LINUX_SOURCES src/linux/elf_allocation.c src/linux/cipher_functions.c src/linux/section_insertion.c src/linux/write_elf.c)
+set(LINUX_SOURCES src/linux/elf_allocation.c src/linux/cipher_functions.c src/linux/section_insertion.c src/linux/write_elf.c src/linux/packing_method.c src/linux/silvio_infection.c src/linux/elf_functions.c)
 set(LINUX_ASSEMBLY_SOURCES src/linux/loader.asm)
 
 set(SOURCES ${SOURCES} ${LINUX_SOURCES} ${LINUX_ASSEMBLY_SOURCES})
