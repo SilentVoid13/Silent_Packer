@@ -33,6 +33,7 @@ int set_new_elf_entry_to_section(t_elf *elf, int section_index) {
     Elf64_Addr last_entry = elf->elf_header->e_entry;
     elf->elf_header->e_entry = elf->section_header[section_index].sh_addr;
     int32_t jump = last_entry - (elf->elf_header->e_entry + loader_size - infos_size);
+
     memcpy(elf->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
 
     return 1;

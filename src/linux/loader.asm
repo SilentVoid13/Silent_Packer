@@ -29,6 +29,9 @@ loader_entry_point:
 	pushfq
 	pushx	rax, rdi, rsi, rsp, rdx, rcx
 
+    ; We save pie offset
+    mov r12, [rel rdi]
+
 	mov	rdi, 1
 	lea	rsi, [rel msg]
 	mov	rdx, msg_len
@@ -45,6 +48,9 @@ start_unpacking:
 	mov	rax, [rel info_addr]
 	mov	rcx, [rel info_size]
 	mov	rdx, [rel info_key]
+
+    ; We add PIE offset
+	add rax, r12
 
 	add	rcx, rax
 

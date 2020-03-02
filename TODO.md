@@ -2,8 +2,8 @@
 # Packer
 - [ ] Make README file
 - [ ] Add dynamic library support
-- [ ] Add PIE support
-    - Probably my asm loader that needs to be changed
+- [x] Add PIE support
+    - Probably my nasm loader that needs to be changed
 - [ ] Add new ciphers
     - [ ] AES
 
