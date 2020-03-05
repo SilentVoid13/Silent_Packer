@@ -23,6 +23,43 @@ Elf64_Shdr new_section = {
         .sh_entsize = 0,
 };
 
+int set_new_string_table(t_elf *elf) {
+    char *new_string_table;
+
+    char *section_name = ".decryption";
+    size_t section_name_length = strlen(section_name);
+
+    int section_string_table_index = elf->elf_header->e_shstrndx;
+
+    size_t new_string_table_size = elf->section_header[section_string_table_index].sh_size + section_name_length + 1;
+    new_string_table = realloc(elf->section_data[section_string_table_index], new_string_table_size);
+    if(new_string_table == NULL) {
+        log_error("realloc() failure");
+        return -1;
+    }
+    memcpy(new_string_table + elf->section_header[section_string_table_index].sh_size, section_name, section_name_length+1);
+
+    // We set it to the end of the old section_string_table
+    new_section.sh_name = elf->section_header[section_string_table_index].sh_size;
+
+    elf->section_data[section_string_table_index] = new_string_table;
+    elf->section_header[section_string_table_index].sh_size = new_string_table_size;
+
+
+    return 1;
+}
+
+int set_new_symtab_sh_link_value(t_elf *elf) {
+    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
+        char *section_name = get_section_name(elf, i);
+        if(strcmp(section_name, ".symtab") == 0) {
+            elf->section_header[i].sh_link += 1;
+        }
+    }
+
+    return 1;
+}
+
 /* Map example
      *
      * --------
@@ -105,12 +142,46 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_sec
     // Shift all char * pointer after the last loadable section to + 1
     memmove(new_section_data + last_loadable_section_index + 2, new_section_data + last_loadable_section_index + 1, remaining_after_section_headers_count);
 
+    // Since we appended a new section
+    last_loadable_section_index += 1;
+
+    // If the section header string table is after our inserted section, we add + 1 to e_shstrndx to correct its index
+    if(elf->elf_header->e_shstrndx > last_loadable_section_index) {
+        elf->elf_header->e_shstrndx += 1;
+    }
+
+    // We set a new proper string table
+    if(set_new_string_table(elf) == -1) {
+        log_error("Error setting new string table");
+        return -1;
+    }
+
+    // Fixing sh_link symbol_table index value
+    // https://docs.oracle.com/cd/E19683-01/816-1386/6m7qcoblj/index.html#chapter6-47976
+    if(set_new_symtab_sh_link_value(elf) == -1) {
+        log_error("Error modifying symtab sh_link value");
+        return -1;
+    }
+
     // Inserting our new loadable section after the last loadable section
-    memcpy(new_section_headers + last_loadable_section_index + 1, &new_section, sizeof(Elf64_Shdr));
-    new_section_data[last_loadable_section_index + 1] = loader;
+    memcpy(new_section_headers + last_loadable_section_index, &new_section, sizeof(Elf64_Shdr));
+    new_section_data[last_loadable_section_index] = loader;
+
 
     return 1;
 }
+
+/*
+void print_link_fields(t_elf *elf) {
+    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
+        printf("section_name : %s\n", get_section_name(elf, i));
+        printf("index : %d\n", i);
+        printf("sh_type : %d\n", elf->section_header[i].sh_type);
+        printf("sh_link : %d\n", elf->section_header[i].sh_link);
+        printf("\n");
+    }
+}
+*/
 
 int set_new_pt_loader_permissions(t_elf *elf) {
     for(int i = 0; i < elf->elf_header->e_phnum; i++) {
@@ -156,11 +227,6 @@ int insert_section(t_elf *elf) {
     // We shift each section offset to make it correct since we moved sections to leave space for our inserted section
     for(int i = last_loadable_section_index; i < elf->elf_header->e_shnum - 1; i++) {
         elf->section_header[i + 1].sh_offset = elf->section_header[i].sh_offset + elf->section_header[i].sh_size;
-    }
-
-    // If the section header string table is after our inserted section, we add + 1 to e_shstrndx to correct its index
-    if(elf->elf_header->e_shstrndx > last_loadable_section_index) {
-        elf->elf_header->e_shstrndx += 1;
     }
 
     // We change the offset of the start of the section header to be correct

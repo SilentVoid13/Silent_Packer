@@ -8,8 +8,8 @@
     - [ ] AES
 
 ## Section insertion
-- [ ] Add section name to the section string table
-- [ ] Fix string table errors
+- [x] Add section name to the section string table
+- [x] Fix string table errors
 
 ## Silvio infection
 - [ ] Add possibility to add big payload and add multiple PAGE_SIZE padding
