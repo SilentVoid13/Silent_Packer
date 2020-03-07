@@ -93,7 +93,7 @@ int allocate_sections_data(t_elf *elf, void *file_data, size_t file_data_size) {
         else {
             if(file_data_size < elf->section_header[i].sh_offset) {
                 // TODO: Change message
-                log_error("Total file size is inferior to a single section data size");
+                log_error("Total file size is inferior to section header offset");
                 return -1;
             }
 

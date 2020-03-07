@@ -6,6 +6,7 @@
     - Probably my nasm loader that needs to be changed
 - [ ] Add new ciphers
     - [ ] AES
+- [ ] Add PE Support
 
 ## Section insertion
 - [x] Add section name to the section string table

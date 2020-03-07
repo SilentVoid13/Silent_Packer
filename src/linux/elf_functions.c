@@ -107,6 +107,24 @@ int find_text_segment(t_elf *elf) {
     return index;
 }
 
+int find_segment_index_of_section(t_elf *elf, int section_index) {
+    int index = -1;
+    for(int i = 0; i < elf->elf_header->e_phnum; i++) {
+        printf("prog_header v_addr : %ld\n", elf->prog_header[i].p_offset);
+        printf("section_addr : %ld\n", elf->section_header[section_index].sh_offset);
+        if(elf->prog_header[i].p_vaddr <= elf->section_header[section_index].sh_addr) {
+            index = i;
+        }
+        else {
+            if(index == -1)
+                index = 0;
+            break;
+        }
+    }
+
+    return index;
+}
+
 char* get_section_name(t_elf *elf, int index) {
     int section_string_table_index = elf->elf_header->e_shstrndx;
     // sh_name contains the index into the section string table of the section name string

@@ -8,6 +8,7 @@
 #include "packer.h"
 #include "section_insertion.h"
 #include "silvio_infection.h"
+#include "code_cave.h"
 
 #include "log.h"
 
@@ -20,8 +21,11 @@ int pack_using_method(t_elf *elf, char *packing_method) {
         }
     }
     else if(strcmp(packing_method, "code_cave") == 0) {
-        // TODO
-    }
+        if(code_cave_injection(elf) == -1) {
+            log_error("Error during Code Cave Injection");
+            return -1;
+        }
+     }
     else if(strcmp(packing_method, "silvio_infection") == 0) {
         if(silvio_infect(elf) == -1) {
             log_error("Error during Silvio infection");
