@@ -142,7 +142,7 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_sec
     // Shift all char * pointer after the last loadable section to + 1
     memmove(new_section_data + last_loadable_section_index + 2, new_section_data + last_loadable_section_index + 1, remaining_after_section_headers_count);
 
-    // Since we appended a new section
+    // Since we append a new section
     last_loadable_section_index += 1;
 
     // If the section header string table is after our inserted section, we add + 1 to e_shstrndx to correct its index
@@ -212,6 +212,9 @@ int insert_section(t_elf *elf) {
 
     // Since we appended a new section
     last_loadable_section_index += 1;
+
+    method_config.concerned_section = last_loadable_section_index;
+
 
     // Set new segment size with our new section included
     size_t new_segment_size = elf->prog_header[last_pt_load_index].p_memsz + loader_size;

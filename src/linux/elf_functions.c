@@ -110,9 +110,9 @@ int find_text_segment(t_elf *elf) {
 int find_segment_index_of_section(t_elf *elf, int section_index) {
     int index = -1;
     for(int i = 0; i < elf->elf_header->e_phnum; i++) {
-        printf("prog_header v_addr : %ld\n", elf->prog_header[i].p_offset);
-        printf("section_addr : %ld\n", elf->section_header[section_index].sh_offset);
-        if(elf->prog_header[i].p_vaddr <= elf->section_header[section_index].sh_addr) {
+        //printf("prog_header v_addr : %ld\n", elf->prog_header[i].p_offset);
+        //printf("section_addr : %ld\n", elf->section_header[section_index].sh_offset);
+        if(elf->prog_header[i].p_offset <= elf->section_header[section_index].sh_offset) {
             index = i;
         }
         else {

@@ -5,6 +5,7 @@
 
 #include "write_elf.h"
 #include "elf_allocation.h"
+#include "packing_method.h"
 
 #include "log.h"
 
@@ -50,7 +51,14 @@ int write_elf(t_elf *elf, char *filename) {
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
         if(elf->section_header[i].sh_type != SHT_NOBITS) {
             add_zero_padding(fd, elf->section_header[i].sh_offset);
-            write_to_file(fd, elf->section_data[i], elf->section_header[i].sh_size);
+
+            // If we find the section with the code cave
+            if(method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
+                write_to_file(fd, elf->section_data[i], elf->section_header[i].sh_size + loader_size);
+            }
+            else {
+                write_to_file(fd, elf->section_data[i], elf->section_header[i].sh_size);
+            }
         }
     }
     add_zero_padding(fd, elf->elf_header->e_shoff);

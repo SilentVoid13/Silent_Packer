@@ -72,6 +72,7 @@ int silvio_infect(t_elf *elf) {
         log_error("Couldn't find last section from .text segment");
         return -1;
     }
+    method_config.concerned_section = last_section_index;
 
     elf->elf_header->e_shoff += PAGE_SIZE64;
     set_new_section_values(elf, last_section_index);
