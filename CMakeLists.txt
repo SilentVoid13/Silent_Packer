@@ -21,18 +21,24 @@ endif(CMAKE_ASM_NASM_COMPILER_LOADED)
 
 ### Includes ###
 include_directories(includes)
+include_directories(includes/ELF)
+include_directories(includes/PE)
 include_directories(src/utilities/Silent_Log)
 
 ### Sources ###
-set(SOURCES src/main.c src/packer.c)
+set(SOURCES src/main.c)
 
 set(UTILITIES_SOURCES src/utilities/Silent_Log/log.c)
 set(SOURCES ${SOURCES} ${UTILITIES_SOURCES})
 
-set(LINUX_SOURCES src/linux/elf_allocation.c src/linux/cipher_functions.c src/linux/section_insertion.c src/linux/write_elf.c src/linux/packing_method.c src/linux/silvio_infection.c src/linux/elf_functions.c src/linux/code_cave.c)
-set(LINUX_ASSEMBLY_SOURCES src/linux/loader.asm)
+set(ELF_SOURCES src/ELF/elf_allocation.c src/ELF/elf_functions.c src/ELF/pack_elf.c src/ELF/encrypt_elf.c src/ELF/section_insertion.c src/ELF/write_elf.c src/ELF/silvio_infection.c src/ELF/code_cave.c)
+set(PE_SOURCES src/PE/pe_allocation.c src/PE/pe_functions.c src/PE/write_pe.c src/PE/pack_pe.c)
 
-set(SOURCES ${SOURCES} ${LINUX_SOURCES} ${LINUX_ASSEMBLY_SOURCES})
+set(ASSEMBLY_SOURCES src/common/loader.asm)
+
+set(COMMON_SOURCES ${ELF_SOURCES} ${PE_SOURCES} src/common/file_allocation.c src/common/cipher_functions.c src/common/packing_method.c)
+
+set(SOURCES ${SOURCES} ${COMMON_SOURCES} ${ASSEMBLY_SOURCES})
 
 add_executable(Silent_Crypt ${SOURCES})
 install(TARGETS Silent_Crypt DESTINATION bin)

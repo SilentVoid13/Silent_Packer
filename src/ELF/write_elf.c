@@ -4,7 +4,7 @@
 //
 
 #include "write_elf.h"
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 #include "packing_method.h"
 
 #include "log.h"

@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 
 int write_elf(t_elf *elf, char *filename);
 

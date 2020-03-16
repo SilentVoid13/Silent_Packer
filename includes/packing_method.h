@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 
 #define CIPHER_KEY_OFFSET 24
 #define TEXT_ENTRY_POINT_OFFSET 16

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 
 char * patch_loader();
 int set_new_elf_entry_to_section(t_elf *elf, int section_index);

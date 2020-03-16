@@ -5,7 +5,7 @@
 
 #include "packing_method.h"
 #include "elf_allocation.h"
-#include "packer.h"
+#include "pack_elf.h"
 #include "section_insertion.h"
 #include "silvio_infection.h"
 #include "code_cave.h"
@@ -15,7 +15,6 @@
 struct method_config method_config;
 
 int pack_using_method(t_elf *elf, char *packing_method) {
-
     if(strcmp(packing_method, "section_insertion") == 0) {
         method_config.method_type = SECTION_INSERTION_METHOD;
         if (insert_section(elf) == -1) {

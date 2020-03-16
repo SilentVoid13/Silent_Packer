@@ -3,15 +3,15 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 
 #include "log.h"
 
-int allocate_elf_header(t_elf *elf, void *file_data, size_t file_data_size) {
+int allocate_elf_elf_header(t_elf *elf, void *file_data, size_t file_data_size) {
     // http://www.openvirtualization.org/documentation/structElf64__Ehdr.html
 
     if(file_data_size < sizeof(Elf64_Ehdr)) {
-        log_error("Total file size is inferior to ELF Header size");
+        log_error("Total file size is less than ELF Header size");
         return -1;
     }
 
@@ -37,7 +37,7 @@ int allocate_elf_header(t_elf *elf, void *file_data, size_t file_data_size) {
     return 1;
 }
 
-int allocate_program_header(t_elf *elf, void *file_data, size_t file_data_size) {
+int allocate_elf_program_header(t_elf *elf, void *file_data, size_t file_data_size) {
     size_t elf_program_header_size = sizeof(Elf64_Phdr) * elf->elf_header->e_phnum;
     if(file_data_size < sizeof(Elf64_Ehdr) + elf_program_header_size) {
         log_error("Total file size is inferior to ELF Header + Program Header size");
@@ -54,7 +54,7 @@ int allocate_program_header(t_elf *elf, void *file_data, size_t file_data_size) 
     return 1;
 }
 
-int allocate_sections_header(t_elf *elf, void *file_data, size_t file_data_size) {
+int allocate_elf_sections_header(t_elf *elf, void *file_data, size_t file_data_size) {
     size_t elf_sections_header_size = sizeof(Elf64_Shdr) * elf->elf_header->e_shnum;
 
     elf->section_header = malloc(elf_sections_header_size);
@@ -76,13 +76,13 @@ int allocate_sections_header(t_elf *elf, void *file_data, size_t file_data_size)
     return 1;
 }
 
-int allocate_sections_data(t_elf *elf, void *file_data, size_t file_data_size) {
-    elf->section_data = malloc(sizeof(int *) * elf->elf_header->e_shnum);
+int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_size) {
+    elf->section_data = malloc(sizeof(char *) * elf->elf_header->e_shnum);
     if(elf->section_data == NULL) {
         log_error("malloc() failure");
         return -1;
     }
-    memset(elf->section_data, 0, sizeof(int *) * elf->elf_header->e_shnum);
+    memset(elf->section_data, 0, sizeof(char *) * elf->elf_header->e_shnum);
 
     size_t elf_section_data_size;
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
@@ -93,7 +93,7 @@ int allocate_sections_data(t_elf *elf, void *file_data, size_t file_data_size) {
         else {
             if(file_data_size < elf->section_header[i].sh_offset) {
                 // TODO: Change message
-                log_error("Total file size is inferior to section header offset");
+                log_error("Total file size is less than section data offset");
                 return -1;
             }
 
@@ -122,22 +122,22 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
     }
     memset(*elf, 0, t_elf_size);
 
-    if(allocate_elf_header(*elf, file_data, file_data_size) == -1) {
+    if(allocate_elf_elf_header(*elf, file_data, file_data_size) == -1) {
         log_error("Error during ELF Header allocation");
         return -1;
     }
 
-    if(allocate_program_header(*elf, file_data, file_data_size) == -1) {
+    if(allocate_elf_program_header(*elf, file_data, file_data_size) == -1) {
         log_error("Error during Program Header allocation");
         return -1;
     }
 
-    if(allocate_sections_header(*elf, file_data, file_data_size) == -1) {
+    if(allocate_elf_sections_header(*elf, file_data, file_data_size) == -1) {
         log_error("Error during Section Header allocation");
         return -1;
     }
 
-    if(allocate_sections_data(*elf, file_data, file_data_size) == -1) {
+    if(allocate_elf_sections_data(*elf, file_data, file_data_size) == -1) {
         log_error("Error during Section Data allocation");
         return -1;
     }

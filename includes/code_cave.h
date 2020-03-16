@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 
 int code_cave_injection(t_elf *elf);
 

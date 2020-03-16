@@ -4,8 +4,8 @@
 //
 
 #include "code_cave.h"
-#include "elf_functions.h"
-#include "elf_allocation.h"
+#include "ELF/elf_functions.h"
+#include "ELF/elf_allocation.h"
 #include "packing_method.h"
 
 #include "log.h"

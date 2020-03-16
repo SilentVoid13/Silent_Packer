@@ -3,9 +3,9 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "elf_functions.h"
+#include "ELF/elf_functions.h"
 #include "packing_method.h"
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 #include "cipher_functions.h"
 
 #include "log.h"

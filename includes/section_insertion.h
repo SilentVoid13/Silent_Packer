@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "elf_allocation.h"
+#include "ELF/elf_allocation.h"
 
 int insert_section(t_elf *elf);
 
