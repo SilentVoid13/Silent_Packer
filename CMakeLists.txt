@@ -36,7 +36,7 @@ set(PE_SOURCES src/PE/pe_allocation.c src/PE/pe_functions.c src/PE/write_pe.c sr
 
 set(ASSEMBLY_SOURCES src/common/loader.asm)
 
-set(COMMON_SOURCES ${ELF_SOURCES} ${PE_SOURCES} src/common/file_allocation.c src/common/cipher_functions.c src/common/packing_method.c)
+set(COMMON_SOURCES ${ELF_SOURCES} ${PE_SOURCES} src/common/file_functions.c src/common/cipher_functions.c src/common/packing_method.c)
 
 set(SOURCES ${SOURCES} ${COMMON_SOURCES} ${ASSEMBLY_SOURCES})
 

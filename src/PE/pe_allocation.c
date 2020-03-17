@@ -20,13 +20,26 @@ int allocate_pe_dos_header(t_pe *pe, void *file_data, size_t file_data_size) {
     }
     memcpy(pe->dos_header, file_data, sizeof(IMAGE_DOS_HEADER));
 
-    // PE\0\0 or 0x00004550
-    if(pe->dos_header->e_magic != PEMAG) {
+    // 0x5a4d
+    if(pe->dos_header->e_magic != DOSMAG) {
         log_error("Magic bytes does not match PE bytes");
         return -1;
     }
 
     // TODO : check architecture like in ELF
+
+    return 1;
+}
+
+int allocate_pe_dos_stub(t_pe *pe, void *file_data) {
+    size_t dos_stub_size = pe->dos_header->e_lfanew - sizeof(IMAGE_DOS_HEADER);
+
+    pe->dos_stub = malloc(dos_stub_size);
+    if(pe->dos_stub == NULL) {
+        log_error("malloc() failure");
+        return -1;
+    }
+    memcpy(pe->dos_stub, file_data + sizeof(IMAGE_DOS_HEADER), dos_stub_size);
 
     return 1;
 }
@@ -77,19 +90,41 @@ int allocate_pe_sections_headers(t_pe *pe, void *file_data, size_t file_data_siz
             log_error("Total file size is inferior to PE section header size");
             return -1;
         }
-        memcpy(&(pe->section_header[i]), file_data + pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS32) + (i * sizeof(IMAGE_SECTION_HEADER)), pe_sections_header_size);
+        memcpy(&(pe->section_header[i]), file_data + pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS32) + (i * sizeof(IMAGE_SECTION_HEADER)), sizeof(IMAGE_SECTION_HEADER));
     }
 
     return 1;
 }
 
+void print_pe_info(t_pe *pe) {
+    printf("e_lfanew : %d\n", pe->dos_header->e_lfanew);
+
+    printf("section_header size : %ld\n", sizeof(IMAGE_SECTION_HEADER) * pe->pe_header->FileHeader.NumberOfSections);
+
+    printf("sizeof IMAGE_NT_HEADERS32 : %ld\n", sizeof(IMAGE_NT_HEADERS32));
+    printf("sizeof uint32_t : %ld\n", sizeof(uint32_t));
+    printf("sizeof IMAGE_FILE_HEADER : %ld\n", sizeof(IMAGE_FILE_HEADER));
+    printf("sizeof IMAGE_OPTIONAL_HEADER32 : %ld\n", sizeof(IMAGE_OPTIONAL_HEADER32));
+
+    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
+        printf("section_offset: %d\n", pe->section_header[i].PointerToRawData);
+        printf("section_size : %d\n", pe->section_header[i].SizeOfRawData);
+        if(i != pe->pe_header->FileHeader.NumberOfSections-1) {
+            printf("next_section_offset : %d\n", pe->section_header[i+1].PointerToRawData);
+        }
+        printf("\n");
+    }
+}
+
 int allocate_pe_sections_data(t_pe *pe, void *file_data, size_t file_data_size) {
-    pe->section_data = malloc(sizeof(char *) * pe->pe_header->FileHeader.NumberOfSections);
+    size_t section_data_size = sizeof(char *) * pe->pe_header->FileHeader.NumberOfSections;
+
+    pe->section_data = malloc(section_data_size);
     if(pe->section_data == NULL) {
         log_error("malloc() failure");
         return -1;
     }
-    memset(pe->section_data, 0, sizeof(char *) * pe->pe_header->FileHeader.NumberOfSections);
+    memset(pe->section_data, 0, section_data_size);
 
     size_t pe_section_data_size;
     for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
@@ -126,15 +161,27 @@ int allocate_pe(t_pe **pe, void *file_data, size_t file_data_size) {
         return -1;
     }
 
+    if(allocate_pe_dos_stub(*pe, file_data) == -1) {
+        log_error("Error during DOS Stub allocation");
+        return -1;
+    }
+
     if(allocate_pe_pe_header(*pe, file_data, file_data_size) == -1) {
         log_error("Error during PE Header allocation");
         return -1;
     }
 
     if(allocate_pe_sections_headers(*pe, file_data, file_data_size) == -1) {
+        log_error("Error during Section Headers allocation");
+        return -1;
+    }
+
+    if(allocate_pe_sections_data(*pe, file_data, file_data_size) == -1) {
         log_error("Error during Section Data allocation");
         return -1;
     }
+
+    //print_pe_info(*pe);
 
     return 1;
 }

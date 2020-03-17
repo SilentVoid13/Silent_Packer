@@ -5,7 +5,7 @@
 
 #include "pack_elf.h"
 #include "elf_allocation.h"
-#include "file_allocation.h"
+#include "file_functions.h"
 #include "encrypt_elf.h"
 #include "write_elf.h"
 #include "packing_method.h"
@@ -58,7 +58,7 @@ int pack_elf(char *file, char *cipher, char *packing_method, char *output) {
         return -1;
     }
 
-   log_info("Packing using specified method ...");
+    log_info("Packing using specified method ...");
     if(pack_using_method(elf, packing_method) == -1) {
         log_error("Error during ELF packing");
         return -1;

@@ -4,31 +4,13 @@
 //
 
 #include "write_elf.h"
-#include "ELF/elf_allocation.h"
+#include "elf_allocation.h"
 #include "packing_method.h"
+#include "file_functions.h"
 
 #include "log.h"
 
-// To keep track of the bytes written for the padding
-size_t offset = 0;
 
-int write_to_file(int fd, void *data, size_t data_size) {
-    size_t n_bytes;
-    if((n_bytes = write(fd, data, data_size)) != data_size) {
-        log_error("write() failure");
-        return -1;
-    }
-    offset += n_bytes;
-
-    return 1;
-}
-
-void add_zero_padding(int fd, size_t end_offset) {
-    char c = 0;
-    while(offset < end_offset) {
-        write_to_file(fd, &c, sizeof(c));
-    }
-}
 
 int write_elf(t_elf *elf, char *filename) {
     int fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0755); // NOLINT(hicpp-signed-bitwise)
