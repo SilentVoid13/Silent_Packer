@@ -12,7 +12,6 @@
 
 #include "ELF/elf_allocation.h"
 
-char * patch_loader();
 int set_new_elf_entry_to_section(t_elf *elf, int section_index);
 int find_last_segment_of_type(t_elf *elf, unsigned int p_type);
 int find_last_section(t_elf *elf, int segment_index);

@@ -5,8 +5,9 @@
 
 #include "write_elf.h"
 #include "elf_allocation.h"
-#include "packing_method.h"
 #include "file_functions.h"
+#include "packing_method_elf.h"
+#include "loader_functions.h"
 
 #include "log.h"
 

@@ -3,7 +3,7 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "packing_method.h"
+#include "packing_method_elf.h"
 #include "elf_allocation.h"
 #include "pack_elf.h"
 #include "section_insertion.h"

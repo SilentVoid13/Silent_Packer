@@ -85,6 +85,7 @@ int allocate_pe_sections_headers(t_pe *pe, void *file_data, size_t file_data_siz
     }
     memset(pe->section_header, 0, pe_sections_header_size);
 
+    // TODO: Check for IMAGE_SCN_CNT_UNINITIALIZED_DATA type like in elf_allocation
     for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
         if(file_data_size < pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS32) + (i * sizeof(IMAGE_SECTION_HEADER))) {
             log_error("Total file size is inferior to PE section header size");

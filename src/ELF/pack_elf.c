@@ -8,7 +8,7 @@
 #include "file_functions.h"
 #include "encrypt_elf.h"
 #include "write_elf.h"
-#include "packing_method.h"
+#include "packing_method_elf.h"
 
 #include "log.h"
 

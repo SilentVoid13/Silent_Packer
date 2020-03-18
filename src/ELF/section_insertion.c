@@ -4,9 +4,10 @@
 //
 
 #include "section_insertion.h"
-#include "packing_method.h"
+#include "packing_method_elf.h"
 #include "cipher_functions.h"
-#include "ELF/elf_functions.h"
+#include "elf_functions.h"
+#include "loader_functions.h"
 
 #include "log.h"
 

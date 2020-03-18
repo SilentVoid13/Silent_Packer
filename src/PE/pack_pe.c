@@ -7,6 +7,7 @@
 #include "pe_allocation.h"
 #include "file_functions.h"
 #include "write_pe.h"
+#include "packing_method_pe.h"
 
 #include "log.h"
 
@@ -31,6 +32,17 @@ int pack_pe(char *file, char *cipher, char *packing_method, char *output) {
     munmap(file_data, file_data_size);
 
     // TODO: Encrypt + pack stub
+    log_info("Encrypting .text section ...");
+    if(encrypt_pe(pe, cipher) == -1) {
+        log_error("Error during ELF encryption");
+        return -1;
+    }
+
+    log_info("Packing using specified method ...");
+    if(pack_using_method_pe(pe, packing_method) == -1) {
+        log_error("Error during ELF packing");
+        return -1;
+    }
 
     char *filename;
     if(output != NULL)
