@@ -7,7 +7,7 @@
 
 #include "log.h"
 
-int allocate_pe_dos_header(t_pe *pe, void *file_data, size_t file_data_size) {
+int allocate_pe_dos_header(t_pe64 *pe, void *file_data, size_t file_data_size) {
     if(file_data_size < sizeof(IMAGE_DOS_HEADER)) {
         log_error("Total file size is less than DOS Header size");
         return -1;
@@ -31,7 +31,7 @@ int allocate_pe_dos_header(t_pe *pe, void *file_data, size_t file_data_size) {
     return 1;
 }
 
-int allocate_pe_dos_stub(t_pe *pe, void *file_data) {
+int allocate_pe_dos_stub(t_pe64 *pe, void *file_data) {
     size_t dos_stub_size = pe->dos_header->e_lfanew - sizeof(IMAGE_DOS_HEADER);
 
     pe->dos_stub = malloc(dos_stub_size);
@@ -44,18 +44,18 @@ int allocate_pe_dos_stub(t_pe *pe, void *file_data) {
     return 1;
 }
 
-int allocate_pe_pe_header(t_pe *pe, void *file_data, size_t file_data_size) {
-    if(file_data_size < sizeof(IMAGE_NT_HEADERS32))  {
+int allocate_pe_pe_header(t_pe64 *pe, void *file_data, size_t file_data_size) {
+    if(file_data_size < sizeof(IMAGE_NT_HEADERS64))  {
         log_error("Total file size is less than PE Header size");
         return -1;
     }
 
-    pe->pe_header = malloc(sizeof(IMAGE_NT_HEADERS32));
+    pe->pe_header = malloc(sizeof(IMAGE_NT_HEADERS64));
     if(pe->pe_header == NULL) {
         log_error("malloc() failure");
         return -1;
     }
-    memcpy(pe->pe_header, file_data + pe->dos_header->e_lfanew, sizeof(IMAGE_NT_HEADERS32));
+    memcpy(pe->pe_header, file_data + pe->dos_header->e_lfanew, sizeof(IMAGE_NT_HEADERS64));
 
     if((pe->pe_header->FileHeader.Characteristics & IMAGE_FILE_EXECUTABLE_IMAGE) == 0) { // NOLINT(hicpp-signed-bitwise)
         log_error("The file is not an executable");
@@ -67,7 +67,7 @@ int allocate_pe_pe_header(t_pe *pe, void *file_data, size_t file_data_size) {
         return -1;
     }
 
-    if(pe->pe_header->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if(pe->pe_header->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
         log_error("File is not an executable image");
         return -1;
     }
@@ -75,7 +75,7 @@ int allocate_pe_pe_header(t_pe *pe, void *file_data, size_t file_data_size) {
     return 1;
 }
 
-int allocate_pe_sections_headers(t_pe *pe, void *file_data, size_t file_data_size) {
+int allocate_pe_sections_headers(t_pe64 *pe, void *file_data, size_t file_data_size) {
     size_t pe_sections_header_size = sizeof(IMAGE_SECTION_HEADER) * pe->pe_header->FileHeader.NumberOfSections;
 
     pe->section_header = malloc(pe_sections_header_size);
@@ -87,25 +87,25 @@ int allocate_pe_sections_headers(t_pe *pe, void *file_data, size_t file_data_siz
 
     // TODO: Check for IMAGE_SCN_CNT_UNINITIALIZED_DATA type like in elf_allocation
     for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
-        if(file_data_size < pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS32) + (i * sizeof(IMAGE_SECTION_HEADER))) {
+        if(file_data_size < pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS64) + (i * sizeof(IMAGE_SECTION_HEADER))) {
             log_error("Total file size is inferior to PE section header size");
             return -1;
         }
-        memcpy(&(pe->section_header[i]), file_data + pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS32) + (i * sizeof(IMAGE_SECTION_HEADER)), sizeof(IMAGE_SECTION_HEADER));
+        memcpy(&(pe->section_header[i]), file_data + pe->dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS64) + (i * sizeof(IMAGE_SECTION_HEADER)), sizeof(IMAGE_SECTION_HEADER));
     }
 
     return 1;
 }
 
-void print_pe_info(t_pe *pe) {
+void print_pe_info(t_pe64 *pe) {
     printf("e_lfanew : %d\n", pe->dos_header->e_lfanew);
 
     printf("section_header size : %ld\n", sizeof(IMAGE_SECTION_HEADER) * pe->pe_header->FileHeader.NumberOfSections);
 
-    printf("sizeof IMAGE_NT_HEADERS32 : %ld\n", sizeof(IMAGE_NT_HEADERS32));
+    printf("sizeof IMAGE_NT_HEADERS64 : %ld\n", sizeof(IMAGE_NT_HEADERS64));
     printf("sizeof uint32_t : %ld\n", sizeof(uint32_t));
     printf("sizeof IMAGE_FILE_HEADER : %ld\n", sizeof(IMAGE_FILE_HEADER));
-    printf("sizeof IMAGE_OPTIONAL_HEADER32 : %ld\n", sizeof(IMAGE_OPTIONAL_HEADER32));
+    printf("sizeof IMAGE_OPTIONAL_HEADER64 : %ld\n", sizeof(IMAGE_OPTIONAL_HEADER64));
 
     for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
         printf("section_offset: %d\n", pe->section_header[i].PointerToRawData);
@@ -117,7 +117,7 @@ void print_pe_info(t_pe *pe) {
     }
 }
 
-int allocate_pe_sections_data(t_pe *pe, void *file_data, size_t file_data_size) {
+int allocate_pe_sections_data(t_pe64 *pe, void *file_data, size_t file_data_size) {
     size_t section_data_size = sizeof(char *) * pe->pe_header->FileHeader.NumberOfSections;
 
     pe->section_data = malloc(section_data_size);
@@ -147,8 +147,8 @@ int allocate_pe_sections_data(t_pe *pe, void *file_data, size_t file_data_size) 
     return 1;
 }
 
-int allocate_pe(t_pe **pe, void *file_data, size_t file_data_size) {
-    size_t t_pe_size = sizeof(t_pe);
+int allocate_pe(t_pe64 **pe, void *file_data, size_t file_data_size) {
+    size_t t_pe_size = sizeof(t_pe64);
 
     *pe = malloc(t_pe_size);
     if(*pe == NULL) {
@@ -157,26 +157,31 @@ int allocate_pe(t_pe **pe, void *file_data, size_t file_data_size) {
     }
     memset(*pe, 0, t_pe_size);
 
+    log_verbose("Allocating DOS Header ...");
     if(allocate_pe_dos_header(*pe, file_data, file_data_size) == -1) {
         log_error("Error during DOS Header allocation");
         return -1;
     }
 
+    log_verbose("Allocating DOS Stub ...");
     if(allocate_pe_dos_stub(*pe, file_data) == -1) {
         log_error("Error during DOS Stub allocation");
         return -1;
     }
 
+    log_verbose("Allocating PE Header ...");
     if(allocate_pe_pe_header(*pe, file_data, file_data_size) == -1) {
         log_error("Error during PE Header allocation");
         return -1;
     }
 
+    log_verbose("Allocating Sections Headers ...");
     if(allocate_pe_sections_headers(*pe, file_data, file_data_size) == -1) {
         log_error("Error during Section Headers allocation");
         return -1;
     }
 
+    log_verbose("Allocating Sections Data ...");
     if(allocate_pe_sections_data(*pe, file_data, file_data_size) == -1) {
         log_error("Error during Section Data allocation");
         return -1;

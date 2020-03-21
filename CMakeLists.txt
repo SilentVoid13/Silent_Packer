@@ -32,7 +32,7 @@ set(UTILITIES_SOURCES src/utilities/Silent_Log/log.c)
 set(SOURCES ${SOURCES} ${UTILITIES_SOURCES})
 
 set(ELF_SOURCES src/ELF/elf_allocation.c src/ELF/elf_functions.c src/ELF/pack_elf.c src/ELF/encrypt_elf.c src/ELF/section_insertion.c src/ELF/write_elf.c src/ELF/silvio_infection.c src/ELF/code_cave.c)
-set(PE_SOURCES src/PE/pe_allocation.c src/PE/pe_functions.c src/PE/write_pe.c src/PE/pack_pe.c src/PE/pe_code_cave.c src/PE/packing_method_pe.c)
+set(PE_SOURCES src/PE/pe_allocation.c src/PE/pe_functions.c src/PE/write_pe.c src/PE/pack_pe.c src/PE/pe_code_cave.c src/PE/packing_method_pe.c src/PE/encrypt_pe.c)
 
 set(ASSEMBLY_SOURCES src/common/loader.asm)
 

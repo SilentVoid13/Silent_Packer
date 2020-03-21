@@ -16,6 +16,6 @@
 
 #include "pe_allocation.h"
 
-int write_pe(t_pe *pe, char *filename);
+int write_pe(t_pe64 *pe, char *filename);
 
 #endif //SILENT_CRYPT_WRITE_PE_H

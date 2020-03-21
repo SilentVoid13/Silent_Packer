@@ -30,7 +30,7 @@ loader_entry_point:
 	pushx	rax, rdi, rsi, rsp, rdx, rcx
 
     ; We save pie offset
-    mov r12, [rel rdi]
+    ;mov r12, [rel rdi]
 
 	mov	rdi, 1
 	lea	rsi, [rel msg]

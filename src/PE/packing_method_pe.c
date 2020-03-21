@@ -11,7 +11,7 @@
 
 struct method_config method_config;
 
-int pack_using_method_pe(t_pe *pe, char *packing_method) {
+int pack_using_method_pe(t_pe64 *pe, char *packing_method) {
     if(strcmp(packing_method, "section_insertion") == 0) {
         /*
         method_config.method_type = SECTION_INSERTION_METHOD;

@@ -12,6 +12,6 @@
 
 #include "pe_allocation.h"
 
-int pe_code_cave_injection(t_pe *pe);
+int pe_code_cave_injection(t_pe64 *pe);
 
 #endif //SILENT_CRYPT_CODE_CAVE_H

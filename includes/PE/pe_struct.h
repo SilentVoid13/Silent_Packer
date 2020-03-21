@@ -164,11 +164,79 @@ typedef struct _IMAGE_OPTIONAL_HEADER32 {
     IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; /**< Array of #IMAGE_DATA_DIRECTORY structures. See WINNT.H. */
 } IMAGE_OPTIONAL_HEADER32, *PIMAGE_OPTIONAL_HEADER32;
 
+typedef struct _IMAGE_OPTIONAL_HEADER64 {
+    uint16_t Magic; /**< OPTIONAL header signature. Equals to
+                      #IMAGE_NT_OPTIONAL_HDR64_MAGIC for 64bits EXE files. */
+    uint8_t MajorLinkerVersion; /**< The version of the linker that produced the file. */
+    uint8_t MinorLinkerVersion; /**< The version of the linker that produced the file. */
+    uint32_t SizeOfCode; /**< The combined and rounded-up size of all the code
+                           sections (most of the time, '.text' section). */
+    uint32_t SizeOfInitializedData;
+    uint32_t SizeOfUninitializedData;
+    uint32_t AddressOfEntryPoint; /**< The address where the loader will begin
+                                    the execution. */
+    uint32_t BaseOfCode; /**< Relative virtual address where the code sections
+                           begin. */
+    uint64_t ImageBase; /**< Assumed location where the file will be
+                          memory-mapped. */
+    uint32_t SectionAlignment; /**< Alignment value for a section. */
+    uint32_t FileAlignment; /**< Alignment value for the file's raw data. */
+    uint16_t MajorOperatingSystemVersion; /**< The minimum version of the
+                                            operating system required to use
+                                            the executable. */
+    uint16_t MinorOperatingSystemVersion; /**< The minimum version of the
+                                            operating system required to use
+                                            the executable. */
+    uint16_t MajorImageVersion; /**< User-definable field to allow different
+                                  version of an EXE file. */
+    uint16_t MinorImageVersion; /**< User-definable field to allow different
+                                  version of an EXE file. */
+    uint16_t MajorSubsystemVersion; /**< The minimum subsystem version required
+                                      to run the EXE file. Typical value 3.10
+                                      (meaning Windows NT 3.1). */
+    uint16_t MinorSubsystemVersion; /**< The minimum subsystem version required
+                                      to run the EXE file. Typical value 3.10
+                                      (meaning Windows NT 3.1). */
+    uint32_t Win32VersionValue; /**< Reserved. */
+    uint32_t SizeOfImage; /**< Total size starting from the image base to the
+                            end of the last section. The end of the last
+                            section is rounded up to the nearest multiple of
+                            the #SectionAlignment value. */
+    uint32_t SizeOfHeaders; /**< Size of the PE headers and the section table.
+                              The raw section data starts immediately after all
+                              the header components. */
+    uint32_t CheckSum; /**< CRC checksum. Usualy ignored and set to 0. */
+    uint16_t Subsystem; /**< Type of subsystem used for its user interface. */
+    uint16_t DllCharacteristics; /**< Set of flags indicating under which
+                                   circumstances a DLL's initialization
+                                   function will be called. Appears to always
+                                   be set to 0. */
+    uint64_t SizeOfStackReserve; /**< The amount of virtual memory to reserve
+                                   for the initial thread's stack. */
+    uint64_t SizeOfStackCommit; /**< The amount of memory initially committed
+                                  for the initial thread's stack. */
+    uint64_t SizeOfHeapReserve; /**< The amount of memory initially committed
+                                  in the process heap. */
+    uint64_t SizeOfHeapCommit; /**< The amount of memory initially committed in
+                                 the process heap. */
+    uint32_t LoaderFlags; /**< Debugging related field. */
+    uint32_t NumberOfRvaAndSizes; /**< The number of entries in the
+                                    #DataDirectory array. Always set to 16 by
+                                    the tools. */
+    IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; /**< Array of #IMAGE_DATA_DIRECTORY structures. See WINNT.H. */
+} IMAGE_OPTIONAL_HEADER64, *PIMAGE_OPTIONAL_HEADER64;
+
 typedef struct _IMAGE_NT_HEADERS32 {
     uint32_t Signature;
     IMAGE_FILE_HEADER FileHeader;
     IMAGE_OPTIONAL_HEADER32 OptionalHeader;
 } IMAGE_NT_HEADERS32;
+
+typedef struct _IMAGE_NT_HEADERS64 {
+    uint32_t Signature;
+    IMAGE_FILE_HEADER FileHeader;
+    IMAGE_OPTIONAL_HEADER64 OptionalHeader;
+} IMAGE_NT_HEADERS64, *PIMAGE_NT_HEADERS64;
 
 typedef struct _IMAGE_SECTION_HEADER {
     uint8_t Name[IMAGE_SIZEOF_SHORT_NAME]; /**< 8-bytes ANSI name of the

@@ -8,6 +8,7 @@
 #include "file_functions.h"
 #include "write_pe.h"
 #include "packing_method_pe.h"
+#include "encrypt_pe.h"
 
 #include "log.h"
 
@@ -22,7 +23,7 @@ int pack_pe(char *file, char *cipher, char *packing_method, char *output) {
     }
 
     log_info("Allocating PE in memory ...");
-    t_pe *pe = NULL;
+    t_pe64 *pe = NULL;
     if(allocate_pe(&pe, file_data, file_data_size) == -1) {
         log_error("Error during PE allocation");
         return -1;

@@ -13,6 +13,6 @@
 #include "pe_allocation.h"
 #include "packing_method.h"
 
-int pack_using_method_pe(t_pe *pe, char *packing_method);
+int pack_using_method_pe(t_pe64 *pe, char *packing_method);
 
 #endif //SILENT_CRYPT_PACKING_METHOD_PE_H

@@ -11,7 +11,7 @@
 
 #include "log.h"
 
-int find_pe_code_cave_index(t_pe *pe) {
+int find_pe_code_cave_index(t_pe64 *pe) {
     unsigned int code_cave_size;
 
     for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
@@ -26,15 +26,16 @@ int find_pe_code_cave_index(t_pe *pe) {
     return -1;
 }
 
-int set_new_pe_section_values_cave(t_pe *pe, int section_index) {
-    pe->section_header[section_index].Misc.VirtualSize += loader_size;
+int set_new_pe_section_values_cave(t_pe64 *pe, int section_index) {
     // TODO: Maybe add PhysicalSize ?
+    pe->section_header[section_index].Misc.VirtualSize += loader_size;
+
+    add_pe_section_permission(pe, section_index, IMAGE_SCN_MEM_WRITE); // NOLINT(hicpp-signed-bitwise)
 
     return 1;
 }
 
-int pe_insert_loader(t_pe *pe, int section_index) {
-    size_t old_section_size = pe->section_header[section_index].PointerToRawData + pe->section_header[section_index].Misc.VirtualSize;
+int pe_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
     char *new_section_data = realloc(pe->section_data[section_index], old_section_size + loader_size);
     if(new_section_data == NULL) {
         log_error("realloc() failure");
@@ -52,12 +53,14 @@ int pe_insert_loader(t_pe *pe, int section_index) {
     return 1;
 }
 
-int pe_code_cave_injection(t_pe *pe) {
+int pe_code_cave_injection(t_pe64 *pe) {
     int section_cave_index = find_pe_code_cave_index(pe);
     if(section_cave_index == -1) {
         log_error("Couldn't find any code cave in this PE file");
         return -1;
     }
+
+    printf("Section_cave_index : %d\n", section_cave_index);
 
     int old_section_size = pe->section_header[section_cave_index].Misc.VirtualSize;
     if(set_new_pe_section_values_cave(pe, section_cave_index) == -1) {
@@ -65,12 +68,15 @@ int pe_code_cave_injection(t_pe *pe) {
         return -1;
     }
 
-    if(pe_insert_loader(pe, section_cave_index) == -1) {
+    if(pe_insert_loader(pe, section_cave_index, old_section_size) == -1) {
         log_error("Error during Loader insertion");
         return -1;
     }
 
-    uint32_t loader_addr = pe->section_header[section_cave_index].PointerToRawData + pe->section_header[section_cave_index].Misc.VirtualSize;
+    printf("old_section_size: %x\n", old_section_size);
+    uint32_t loader_addr = pe->section_header[section_cave_index].VirtualAddress + old_section_size;
+    printf("base_addr : %x\n", pe->section_header[section_cave_index].VirtualAddress);
+    printf("loader_addr: %x\n", loader_addr);
     set_new_pe_entry_to_addr(pe, loader_addr, section_cave_index, old_section_size);
 
     return 1;

@@ -12,7 +12,8 @@
 
 #include "pe_allocation.h"
 
-int find_pe_text_section(t_pe *pe);
-int set_new_pe_entry_to_addr(t_pe *pe, uint32_t entry_addr, int section_index, int section_size);
+int find_pe_text_section(t_pe64 *pe);
+int set_new_pe_entry_to_addr(t_pe64 *pe, uint32_t entry_addr, int section_index, int section_size);
+void add_pe_section_permission(t_pe64 *pe, int segment_index, int permission);
 
 #endif //SILENT_CRYPT_PE_FUNCTIONS_H
