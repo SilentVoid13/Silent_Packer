@@ -14,7 +14,7 @@
 
 int set_new_elf_entry_to_section(t_elf *elf, int section_index);
 int find_last_elf_segment_of_type(t_elf *elf, unsigned int p_type);
-int find_last_elf_section(t_elf *elf, int segment_index);
+int find_last_elf_section_of_segment(t_elf *elf, int segment_index);
 int find_last_elf_section_from_segment(t_elf *elf, int segment_index);
 int find_elf_text_segment(t_elf *elf);
 int find_elf_segment_index_of_section(t_elf *elf, int section_index);

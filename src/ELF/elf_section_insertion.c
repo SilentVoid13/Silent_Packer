@@ -203,7 +203,7 @@ int elf_insert_section(t_elf *elf) {
         return -1;
     }
 
-    int last_loadable_section_index = find_last_elf_section(elf, last_pt_load_index);
+    int last_loadable_section_index = find_last_elf_section_of_segment(elf, last_pt_load_index);
     if(last_loadable_section_index == -1) {
         log_error("Couldn't find the last Section index");
         return -1;

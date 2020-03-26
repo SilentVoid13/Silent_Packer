@@ -53,4 +53,7 @@ s_elf struct :
 - [ ] Clean code
 
 ### Section insertion
-- [ ] Add section insertion packing method
+- [x] Add section insertion packing method
+- [ ] Fix section insertion not working for every binary
+    - Don't know why it's adding some null bytes at the beggining of the section making the offsets wrong when decrypting the .text
+    

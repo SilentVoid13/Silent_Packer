@@ -14,9 +14,18 @@ int set_new_pe_entry_to_addr(t_pe64 *pe, uint32_t entry_addr, int section_index,
     uint32_t last_entry = pe->pe_header->OptionalHeader.AddressOfEntryPoint;
     pe->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
     int32_t jump = last_entry - (pe->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
-    printf("jump : %d\n", jump);
 
     memcpy(pe->section_data[section_index] + section_size + loader_size - (infos_size + 4), &jump, 4);
+
+    return 1;
+}
+
+int set_new_pe_entry_to_section(t_pe64 *pe, int section_index) {
+    uint32_t last_entry = pe->pe_header->OptionalHeader.AddressOfEntryPoint;
+    pe->pe_header->OptionalHeader.AddressOfEntryPoint = pe->section_header[section_index].VirtualAddress;
+    int32_t jump = last_entry - (pe->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+
+    memcpy(pe->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
 
     return 1;
 }

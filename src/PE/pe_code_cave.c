@@ -61,6 +61,7 @@ int pe_cave_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
 
     // For ASM
     loader_offset = pe->section_header[section_index].VirtualAddress + old_section_size;
+    printf("loader_offset : %lx\n", loader_offset);
 
     char *loader = patch_loader();
     if(loader == NULL) {

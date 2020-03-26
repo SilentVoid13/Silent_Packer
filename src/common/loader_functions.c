@@ -29,8 +29,6 @@ char * patch_loader() {
     memcpy(loader + loader_size - CIPHER_KEY_OFFSET, &cipher_key, sizeof(uint64_t));
     memcpy(loader + loader_size - TEXT_ENTRY_POINT_OFFSET, &text_entry_point, sizeof(uint64_t));
     memcpy(loader + loader_size - TEXT_DATA_SIZE_OFFSET, &text_data_size, sizeof(uint64_t));
-    printf("loader_offset : %lx\n", loader_offset);
-    printf("size of uint64_t : %lx\n", sizeof(uint64_t));
     memcpy(loader + loader_size - LOADER_OFFSET_OFFSET, &loader_offset, sizeof(uint64_t));
 
     return loader;

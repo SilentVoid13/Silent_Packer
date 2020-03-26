@@ -43,8 +43,7 @@ void add_elf_segment_permission(t_elf *elf, int segment_index, int permission) {
     elf->prog_header[segment_index].p_flags |= permission; // NOLINT(hicpp-signed-bitwise)
 }
 
-// Find last loadable section
-int find_last_elf_section(t_elf *elf, int segment_index) {
+int find_last_elf_section_of_segment(t_elf *elf, int segment_index) {
     int index = -1;
     Elf64_Phdr *program_header = elf->prog_header + segment_index;
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
