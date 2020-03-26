@@ -97,26 +97,6 @@ int allocate_pe_sections_headers(t_pe64 *pe, void *file_data, size_t file_data_s
     return 1;
 }
 
-void print_pe_info(t_pe64 *pe) {
-    printf("e_lfanew : %d\n", pe->dos_header->e_lfanew);
-
-    printf("section_header size : %ld\n", sizeof(IMAGE_SECTION_HEADER) * pe->pe_header->FileHeader.NumberOfSections);
-
-    printf("sizeof IMAGE_NT_HEADERS64 : %ld\n", sizeof(IMAGE_NT_HEADERS64));
-    printf("sizeof uint32_t : %ld\n", sizeof(uint32_t));
-    printf("sizeof IMAGE_FILE_HEADER : %ld\n", sizeof(IMAGE_FILE_HEADER));
-    printf("sizeof IMAGE_OPTIONAL_HEADER64 : %ld\n", sizeof(IMAGE_OPTIONAL_HEADER64));
-
-    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
-        printf("section_offset: %d\n", pe->section_header[i].PointerToRawData);
-        printf("section_size : %d\n", pe->section_header[i].SizeOfRawData);
-        if(i != pe->pe_header->FileHeader.NumberOfSections-1) {
-            printf("next_section_offset : %d\n", pe->section_header[i+1].PointerToRawData);
-        }
-        printf("\n");
-    }
-}
-
 int allocate_pe_sections_data(t_pe64 *pe, void *file_data, size_t file_data_size) {
     size_t section_data_size = sizeof(char *) * pe->pe_header->FileHeader.NumberOfSections;
 
@@ -145,6 +125,28 @@ int allocate_pe_sections_data(t_pe64 *pe, void *file_data, size_t file_data_size
     }
 
     return 1;
+}
+
+void print_pe_info(t_pe64 *pe) {
+    printf("e_lfanew : %d\n", pe->dos_header->e_lfanew);
+
+    printf("section_header size : %ld\n", sizeof(IMAGE_SECTION_HEADER) * pe->pe_header->FileHeader.NumberOfSections);
+
+    printf("sizeof IMAGE_NT_HEADERS64 : %ld\n", sizeof(IMAGE_NT_HEADERS64));
+    printf("sizeof IMAGE_NT_HEADERS32 : %ld\n", sizeof(IMAGE_NT_HEADERS32));
+    printf("sizeof uint32_t : %ld\n", sizeof(uint32_t));
+    printf("sizeof IMAGE_FILE_HEADER : %ld\n", sizeof(IMAGE_FILE_HEADER));
+    printf("sizeof IMAGE_OPTIONAL_HEADER64 : %ld\n", sizeof(IMAGE_OPTIONAL_HEADER64));
+    printf("sizeof IMAGE_OPTIONAL_HEADER32 : %ld\n", sizeof(IMAGE_OPTIONAL_HEADER32));
+
+    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
+        printf("section_offset: %d\n", pe->section_header[i].PointerToRawData);
+        printf("section_size : %d\n", pe->section_header[i].SizeOfRawData);
+        if(i != pe->pe_header->FileHeader.NumberOfSections-1) {
+            printf("next_section_offset : %d\n", pe->section_header[i+1].PointerToRawData);
+        }
+        printf("\n");
+    }
 }
 
 int allocate_pe(t_pe64 **pe, void *file_data, size_t file_data_size) {

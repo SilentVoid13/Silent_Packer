@@ -20,6 +20,7 @@ section .text
 global	loader_entry_point:function
 global	loader_size:data
 global	infos_size:data
+global  test_loader:data
 
 loader_size	dq	end - loader_entry_point
 infos_size	dq	end - info_start
@@ -30,7 +31,8 @@ loader_entry_point:
 	pushx	rax, rdi, rsi, rsp, rdx, rcx
 
     ; We save pie offset
-    ;mov r12, [rel rdi]
+    lea r12, [rel loader_entry_point]
+    sub r12, [rel info_offset]
 
 	mov	rdi, 1
 	lea	rsi, [rel msg]
@@ -52,6 +54,7 @@ start_unpacking:
     ; We add PIE offset
 	add rax, r12
 
+
 	add	rcx, rax
 
 .loop	xor	byte [rax], dl
@@ -66,8 +69,9 @@ start_unpacking:
 
 ; Random values here, to be patched
 info_start:
-info_key:	dq	0x9999999999999999
-info_addr:	dq	0xAAAAAAAAAAAAAAAA
-info_size:	dq	0xBBBBBBBBBBBBBBBB
+info_key:	    dq	0xEEEEEEEEEEEEEEEE
+info_addr:	    dq	0xAAAAAAAAAAAAAAAA
+info_size:	    dq  0xBBBBBBBBBBBBBBBB
+info_offset:    dq  0xCCCCCCCCCCCCCCCC
 
 end:

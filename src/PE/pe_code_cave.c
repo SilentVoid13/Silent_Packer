@@ -3,6 +3,7 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
+#include <PE/pe_struct.h>
 #include "pe_struct.h"
 #include "pe_code_cave.h"
 #include "pe_allocation.h"
@@ -12,12 +13,16 @@
 #include "log.h"
 
 int find_pe_code_cave_index(t_pe64 *pe) {
-    unsigned int code_cave_size;
+    size_t code_cave_size;
 
-    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
-        code_cave_size = pe->pe_header->OptionalHeader.FileAlignment - pe->section_header[i].Misc.VirtualSize;
-        if(code_cave_size > loader_size) {
-            if(pe->section_header[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) { // NOLINT(hicpp-signed-bitwise)
+    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections-1; i++) {
+        if(pe->section_header[i].SizeOfRawData > pe->section_header[i].Misc.VirtualSize) {
+            code_cave_size = pe->section_header[i].SizeOfRawData - pe->section_header[i].Misc.VirtualSize;
+
+            //print_pe_section_info(pe, i);
+
+            if(code_cave_size > loader_size) {
+                printf("code_cave_size: %ld\n", code_cave_size);
                 return i;
             }
         }
@@ -30,7 +35,19 @@ int set_new_pe_section_values_cave(t_pe64 *pe, int section_index) {
     // TODO: Maybe add PhysicalSize ?
     pe->section_header[section_index].Misc.VirtualSize += loader_size;
 
+    // TODO: Change this to use mprotect in the loader
+
+    int text_section_index = find_pe_text_section(pe);
+    printf("text_section_index : %d\n", text_section_index);
+    if(text_section_index == -1) {
+        log_error("Couldn't find .text segment");
+        return -1;
+    }
+    add_pe_section_permission(pe, text_section_index, IMAGE_SCN_MEM_WRITE); // NOLINT(hicpp-signed-bitwise)
+
     add_pe_section_permission(pe, section_index, IMAGE_SCN_MEM_WRITE); // NOLINT(hicpp-signed-bitwise)
+    add_pe_section_permission(pe, section_index, IMAGE_SCN_MEM_READ); // NOLINT(hicpp-signed-bitwise)
+    add_pe_section_permission(pe, section_index, IMAGE_SCN_MEM_EXECUTE); // NOLINT(hicpp-signed-bitwise)
 
     return 1;
 }
@@ -42,6 +59,9 @@ int pe_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
         return -1;
     }
     pe->section_data[section_index] = new_section_data;
+
+    // For ASM
+    loader_offset = pe->section_header[section_index].VirtualAddress + old_section_size;
 
     char *loader = patch_loader();
     if(loader == NULL) {
@@ -73,10 +93,7 @@ int pe_code_cave_injection(t_pe64 *pe) {
         return -1;
     }
 
-    printf("old_section_size: %x\n", old_section_size);
     uint32_t loader_addr = pe->section_header[section_cave_index].VirtualAddress + old_section_size;
-    printf("base_addr : %x\n", pe->section_header[section_cave_index].VirtualAddress);
-    printf("loader_addr: %x\n", loader_addr);
     set_new_pe_entry_to_addr(pe, loader_addr, section_cave_index, old_section_size);
 
     return 1;

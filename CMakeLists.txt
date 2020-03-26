@@ -9,12 +9,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_C_FLAGS "-Wall")
 set(CMAKE_C_FLAGS "-Wextra")
 
-project(Silent_Crypt)
+project(testy)
 
 # https://metricpanda.com/using-nasm-with-cmake-and-clang/
 enable_language(ASM_NASM)
 if(CMAKE_ASM_NASM_COMPILER_LOADED)
     set(CAN_USE_ASSEMBLER TRUE)
+
+    # https://stackoverflow.com/questions/49131996/compile-asm-and-c-with-asm-for-debugging
+    set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
+    set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> \
+    <FLAGS> -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -o <OBJECT> <SOURCE>")
+    set_source_files_properties(src/strlen.asm PROPERTIES COMPILE_FLAGS "-g -Fdwarf")
+
     file(GLOB_RECURSE ENGINE_ASM_FILES "src/engine/*.asm")
     set(ENGINE_SOURCES ${ENGINE_SOURCES} ${ENGINE_ASM_FILES})
 endif(CMAKE_ASM_NASM_COMPILER_LOADED)

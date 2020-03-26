@@ -20,7 +20,6 @@ int set_new_segment_values(t_elf *elf, int text_segment_index) {
     elf->prog_header[text_segment_index].p_filesz += loader_size;
     elf->prog_header[text_segment_index].p_memsz += loader_size;
 
-
     for(int i = text_segment_index + 1; i < elf->elf_header->e_phnum; i++) {
         elf->prog_header[i].p_offset += PAGE_SIZE64;
     }
@@ -48,6 +47,8 @@ int insert_parasite(t_elf *elf, int section_index) {
     }
     elf->section_data[section_index] = new_section_data;
 
+    // For ASM
+    loader_offset = loader_addr;
 
     char *loader = patch_loader();
     if(loader == NULL) {

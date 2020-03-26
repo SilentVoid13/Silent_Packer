@@ -5,7 +5,6 @@
 
 #include "section_insertion.h"
 #include "packing_method_elf.h"
-#include "cipher_functions.h"
 #include "elf_functions.h"
 #include "loader_functions.h"
 
@@ -31,6 +30,8 @@ int set_new_string_table(t_elf *elf) {
     size_t section_name_length = strlen(section_name);
 
     int section_string_table_index = elf->elf_header->e_shstrndx;
+
+    printf("section_string_table_index: %d\n", section_string_table_index);
 
     size_t new_string_table_size = elf->section_header[section_string_table_index].sh_size + section_name_length + 1;
     new_string_table = realloc(elf->section_data[section_string_table_index], new_string_table_size);
@@ -128,6 +129,9 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_sec
 
     new_section.sh_size = loader_size;
 
+    // For ASM
+    loader_offset = new_section.sh_addr;
+
     loader = patch_loader();
     if(loader == NULL) {
         log_error("Error during loader patching");
@@ -167,7 +171,6 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_sec
     // Inserting our new loadable section after the last loadable section
     memcpy(new_section_headers + last_loadable_section_index, &new_section, sizeof(Elf64_Shdr));
     new_section_data[last_loadable_section_index] = loader;
-
 
     return 1;
 }
@@ -224,6 +227,8 @@ int insert_section(t_elf *elf) {
 
     // Set all pt_loader permissions on RWX (pretty ugly)
     set_new_pt_loader_permissions(elf);
+
+    printf("loader_addr:  %lx\n", elf->section_header[last_loadable_section_index].sh_addr);
 
     // Add our new section as the new elf entry point
     set_new_elf_entry_to_section(elf, last_loadable_section_index);

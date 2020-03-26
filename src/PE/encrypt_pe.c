@@ -3,6 +3,7 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
+#include <PE/pe_struct.h>
 #include "encrypt_pe.h"
 #include "cipher_functions.h"
 #include "pe_allocation.h"
@@ -20,8 +21,8 @@ int encrypt_pe(t_pe64 *pe, char *cipher) {
     log_verbose("Got .text section index : %d", text_section_index);
 
     // Setting global variables
-    text_data_size = pe->section_header[text_section_index].SizeOfRawData;
-    text_entry_point = pe->section_header[text_section_index].PointerToRawData;
+    text_entry_point = pe->section_header[text_section_index].VirtualAddress;
+    text_data_size = pe->section_header[text_section_index].Misc.VirtualSize;
 
     log_verbose("Generating random key ...");
     cipher_key = generate_random_key();

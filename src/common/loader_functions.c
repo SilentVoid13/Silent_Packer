@@ -8,6 +8,11 @@
 
 #include "log.h"
 
+uint64_t text_data_size;
+uint64_t text_entry_point;
+uint64_t cipher_key;
+uint64_t loader_offset;
+
 // Set globals variables for nasm code
 char * patch_loader() {
     char *loader = malloc(loader_size);
@@ -15,6 +20,7 @@ char * patch_loader() {
         log_error("malloc() failure");
         return NULL;
     }
+    memset(loader, 0x0, loader_size);
 
     // Copy the loader asm entry point
     memcpy(loader, loader_entry_point, loader_size);
@@ -23,6 +29,9 @@ char * patch_loader() {
     memcpy(loader + loader_size - CIPHER_KEY_OFFSET, &cipher_key, sizeof(uint64_t));
     memcpy(loader + loader_size - TEXT_ENTRY_POINT_OFFSET, &text_entry_point, sizeof(uint64_t));
     memcpy(loader + loader_size - TEXT_DATA_SIZE_OFFSET, &text_data_size, sizeof(uint64_t));
+    printf("loader_offset : %lx\n", loader_offset);
+    printf("size of uint64_t : %lx\n", sizeof(uint64_t));
+    memcpy(loader + loader_size - LOADER_OFFSET_OFFSET, &loader_offset, sizeof(uint64_t));
 
     return loader;
 }

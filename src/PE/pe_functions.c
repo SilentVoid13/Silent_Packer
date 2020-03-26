@@ -34,3 +34,12 @@ int find_pe_text_section(t_pe64 *pe) {
 void add_pe_section_permission(t_pe64 *pe, int segment_index, int permission) {
     pe->section_header[segment_index].Characteristics |= permission; // NOLINT(hicpp-signed-bitwise)
 }
+
+void print_pe_section_info(t_pe64 *pe, int section_index) {
+    puts("");
+    printf("Section name : %s\n", pe->section_header[section_index].Name);
+    printf("VirtualSize : %d\n", pe->section_header[section_index].Misc.VirtualSize);
+    printf("SizeofRawData : %d\n", pe->section_header[section_index].SizeOfRawData);
+    printf("PointerToRawData : %x\n", pe->section_header[section_index].PointerToRawData);
+    printf("VirtualAddress : %x\n", pe->section_header[section_index].VirtualAddress);
+}

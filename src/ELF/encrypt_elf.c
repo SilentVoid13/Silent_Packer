@@ -7,6 +7,7 @@
 #include "cipher_functions.h"
 #include "elf_allocation.h"
 #include "elf_functions.h"
+#include "loader_functions.h"
 
 #include "log.h"
 
@@ -28,7 +29,7 @@ int encrypt_elf(t_elf *elf, char *cipher) {
     log_verbose("Generating random key ...");
     cipher_key = generate_random_key();
     uint64_t temp_key = cipher_key;
-    log_verbose("Random key : %d", cipher_key);
+    log_verbose("Random key : %x", cipher_key);
 
     if(strcmp(cipher, "xor") == 0) {
         xor_encrypt(text_data, text_data_size, temp_key);

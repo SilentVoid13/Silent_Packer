@@ -9,10 +9,6 @@
 
 #include "log.h"
 
-uint64_t text_data_size;
-uint64_t text_entry_point;
-uint64_t cipher_key;
-
 int generate_random_key() {
     // Note: rand() is not a really good pRNG generator but that should be ok in our case
     srand(time(NULL)); // NOLINT(cert-msc32-c,cert-msc51-cpp)

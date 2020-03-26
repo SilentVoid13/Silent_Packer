@@ -11,6 +11,8 @@
 
 #include "log.h"
 
+uint64_t loader_offset;
+
 int find_cave_section_index(t_elf *elf) {
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
         if(elf->section_header[i].sh_type == SHT_NOBITS) {
@@ -65,6 +67,8 @@ int insert_loader(t_elf *elf, int section_index, int old_section_size) {
         return -1;
     }
     elf->section_data[section_index] = new_section_data;
+    // For ASM
+    loader_offset = elf->section_header[section_index].sh_addr + old_section_size;
 
     char *loader = patch_loader();
     if(loader == NULL) {
@@ -102,6 +106,8 @@ int code_cave_injection(t_elf *elf) {
     }
 
     Elf64_Addr loader_addr = elf->section_header[section_cave_index].sh_addr + old_section_size;
+
+    printf("loader_addr : %lx\n", loader_addr);
 
     set_new_elf_entry_to_addr(elf, loader_addr, section_cave_index, old_section_size);
 
