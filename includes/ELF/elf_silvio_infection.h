@@ -14,6 +14,6 @@
 
 #define PAGE_SIZE64 0x2000
 
-int silvio_infect(t_elf *elf);
+int elf_silvio_infect(t_elf *elf);
 
 #endif //SILENT_CRYPT_SILVIO_INFECTION_H

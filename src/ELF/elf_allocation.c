@@ -3,7 +3,7 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "ELF/elf_allocation.h"
+#include "elf_allocation.h"
 
 #include "log.h"
 

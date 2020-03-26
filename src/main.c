@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "main.h"
-#include "pack_elf.h"
-#include "pack_pe.h"
+#include "elf_packing.h"
+#include "pe_packing.h"
 
 #include "argtable3.h"
 #include "log.h"

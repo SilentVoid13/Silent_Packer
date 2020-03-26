@@ -12,6 +12,6 @@
 
 #include "ELF/elf_allocation.h"
 
-int code_cave_injection(t_elf *elf);
+int elf_code_cave_injection(t_elf *elf);
 
 #endif //SILENT_CRYPT_CODE_CAVE_H

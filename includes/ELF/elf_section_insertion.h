@@ -12,6 +12,6 @@
 
 #include "ELF/elf_allocation.h"
 
-int insert_section(t_elf *elf);
+int elf_insert_section(t_elf *elf);
 
 #endif //SILENT_CRYPT_SECTION_INSERTION_H

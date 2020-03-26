@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "section_insertion.h"
-#include "packing_method_elf.h"
+#include "elf_section_insertion.h"
+#include "elf_packing_method.h"
 #include "elf_functions.h"
 #include "loader_functions.h"
 
@@ -23,7 +23,7 @@ Elf64_Shdr new_section = {
         .sh_entsize = 0,
 };
 
-int set_new_string_table(t_elf *elf) {
+int set_new_elf_section_string_table(t_elf *elf) {
     char *new_string_table;
 
     char *section_name = ".decryption";
@@ -51,9 +51,9 @@ int set_new_string_table(t_elf *elf) {
     return 1;
 }
 
-int set_new_symtab_sh_link_value(t_elf *elf) {
+int set_new_elf_section_symtab_sh_link_value(t_elf *elf) {
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        char *section_name = get_section_name(elf, i);
+        char *section_name = find_elf_section_name(elf, i);
         if(strcmp(section_name, ".symtab") == 0) {
             elf->section_header[i].sh_link += 1;
         }
@@ -95,7 +95,7 @@ int set_new_symtab_sh_link_value(t_elf *elf) {
      * --------
      *
 */
-int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_section_index) {
+int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_section_index) {
     Elf64_Shdr *new_section_headers;
     char **new_section_data;
     char *loader;
@@ -156,14 +156,14 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_sec
     }
 
     // We set a new proper string table
-    if(set_new_string_table(elf) == -1) {
+    if(set_new_elf_section_string_table(elf) == -1) {
         log_error("Error setting new string table");
         return -1;
     }
 
     // Fixing sh_link symbol_table index value
     // https://docs.oracle.com/cd/E19683-01/816-1386/6m7qcoblj/index.html#chapter6-47976
-    if(set_new_symtab_sh_link_value(elf) == -1) {
+    if(set_new_elf_section_symtab_sh_link_value(elf) == -1) {
         log_error("Error modifying symtab sh_link value");
         return -1;
     }
@@ -178,7 +178,7 @@ int create_new_section(t_elf *elf, int last_pt_load_index, int last_loadable_sec
 /*
 void print_link_fields(t_elf *elf) {
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        printf("section_name : %s\n", get_section_name(elf, i));
+        printf("section_name : %s\n", find_elf_section_name(elf, i));
         printf("index : %d\n", i);
         printf("sh_type : %d\n", elf->section_header[i].sh_type);
         printf("sh_link : %d\n", elf->section_header[i].sh_link);
@@ -187,7 +187,7 @@ void print_link_fields(t_elf *elf) {
 }
 */
 
-int set_new_pt_loader_permissions(t_elf *elf) {
+int set_new_elf_section_pt_loader_permissions(t_elf *elf) {
     for(int i = 0; i < elf->elf_header->e_phnum; i++) {
         if(elf->prog_header[i].p_type == PT_LOAD) {
             elf->prog_header[i].p_flags = PF_X | PF_W | PF_R; // NOLINT(hicpp-signed-bitwise)
@@ -196,20 +196,20 @@ int set_new_pt_loader_permissions(t_elf *elf) {
     return 1;
 }
 
-int insert_section(t_elf *elf) {
-    int last_pt_load_index = find_last_segment_of_type(elf, PT_LOAD);
+int elf_insert_section(t_elf *elf) {
+    int last_pt_load_index = find_last_elf_segment_of_type(elf, PT_LOAD);
     if(last_pt_load_index == -1) {
         log_error("Couldn't find PT_LOAD segment");
         return -1;
     }
 
-    int last_loadable_section_index = find_last_section(elf, last_pt_load_index);
+    int last_loadable_section_index = find_last_elf_section(elf, last_pt_load_index);
     if(last_loadable_section_index == -1) {
         log_error("Couldn't find the last Section index");
         return -1;
     }
 
-    if(create_new_section(elf, last_pt_load_index, last_loadable_section_index) == -1) {
+    if(elf_section_create_new_section(elf, last_pt_load_index, last_loadable_section_index) == -1) {
         log_error("Error during new Section creation");
         return -1;
     }
@@ -226,9 +226,7 @@ int insert_section(t_elf *elf) {
     elf->prog_header[last_pt_load_index].p_filesz = new_segment_size;
 
     // Set all pt_loader permissions on RWX (pretty ugly)
-    set_new_pt_loader_permissions(elf);
-
-    printf("loader_addr:  %lx\n", elf->section_header[last_loadable_section_index].sh_addr);
+    set_new_elf_section_pt_loader_permissions(elf);
 
     // Add our new section as the new elf entry point
     set_new_elf_entry_to_section(elf, last_loadable_section_index);

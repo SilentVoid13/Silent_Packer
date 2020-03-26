@@ -3,7 +3,6 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include <PE/pe_struct.h>
 #include "pe_struct.h"
 #include "pe_code_cave.h"
 #include "pe_allocation.h"
@@ -31,7 +30,7 @@ int find_pe_code_cave_index(t_pe64 *pe) {
     return -1;
 }
 
-int set_new_pe_section_values_cave(t_pe64 *pe, int section_index) {
+int set_new_pe_cave_section_values(t_pe64 *pe, int section_index) {
     // TODO: Maybe add PhysicalSize ?
     pe->section_header[section_index].Misc.VirtualSize += loader_size;
 
@@ -52,7 +51,7 @@ int set_new_pe_section_values_cave(t_pe64 *pe, int section_index) {
     return 1;
 }
 
-int pe_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
+int pe_cave_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
     char *new_section_data = realloc(pe->section_data[section_index], old_section_size + loader_size);
     if(new_section_data == NULL) {
         log_error("realloc() failure");
@@ -83,12 +82,12 @@ int pe_code_cave_injection(t_pe64 *pe) {
     printf("Section_cave_index : %d\n", section_cave_index);
 
     int old_section_size = pe->section_header[section_cave_index].Misc.VirtualSize;
-    if(set_new_pe_section_values_cave(pe, section_cave_index) == -1) {
+    if(set_new_pe_cave_section_values(pe, section_cave_index) == -1) {
         log_error("Error during section values modification");
         return -1;
     }
 
-    if(pe_insert_loader(pe, section_cave_index, old_section_size) == -1) {
+    if(pe_cave_insert_loader(pe, section_cave_index, old_section_size) == -1) {
         log_error("Error during Loader insertion");
         return -1;
     }

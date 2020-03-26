@@ -38,12 +38,12 @@ set(SOURCES src/main.c)
 set(UTILITIES_SOURCES src/utilities/Silent_Log/log.c)
 set(SOURCES ${SOURCES} ${UTILITIES_SOURCES})
 
-set(ELF_SOURCES src/ELF/elf_allocation.c src/ELF/elf_functions.c src/ELF/pack_elf.c src/ELF/encrypt_elf.c src/ELF/section_insertion.c src/ELF/write_elf.c src/ELF/silvio_infection.c src/ELF/code_cave.c)
-set(PE_SOURCES src/PE/pe_allocation.c src/PE/pe_functions.c src/PE/write_pe.c src/PE/pack_pe.c src/PE/pe_code_cave.c src/PE/packing_method_pe.c src/PE/encrypt_pe.c)
+set(ELF_SOURCES src/ELF/elf_allocation.c src/ELF/elf_functions.c src/ELF/elf_packing.c src/ELF/elf_encryption.c src/ELF/elf_section_insertion.c src/ELF/elf_writing.c src/ELF/elf_silvio_infection.c src/ELF/elf_code_cave.c)
+set(PE_SOURCES src/PE/pe_allocation.c src/PE/pe_functions.c src/PE/pe_writing.c src/PE/pe_packing.c src/PE/pe_code_cave.c src/PE/pe_packing_method.c src/PE/pe_encryption.c src/PE/pe_section_insertion.c)
 
 set(ASSEMBLY_SOURCES src/common/loader.asm)
 
-set(COMMON_SOURCES ${ELF_SOURCES} ${PE_SOURCES} src/common/file_functions.c src/common/cipher_functions.c src/ELF/packing_method_elf.c src/common/loader_functions.c)
+set(COMMON_SOURCES ${ELF_SOURCES} ${PE_SOURCES} src/common/file_functions.c src/common/cipher_functions.c src/ELF/elf_packing_method.c src/common/loader_functions.c)
 
 set(SOURCES ${SOURCES} ${COMMON_SOURCES} ${ASSEMBLY_SOURCES})
 

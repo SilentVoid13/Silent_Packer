@@ -3,7 +3,7 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "packing_method_pe.h"
+#include "pe_packing_method.h"
 #include "pe_allocation.h"
 #include "pe_code_cave.h"
 
@@ -11,7 +11,7 @@
 
 struct method_config method_config;
 
-int pack_using_method_pe(t_pe64 *pe, char *packing_method) {
+int pe_pack_using_method(t_pe64 *pe, char *packing_method) {
     if(strcmp(packing_method, "section_insertion") == 0) {
         /*
         method_config.method_type = SECTION_INSERTION_METHOD;

@@ -3,17 +3,17 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "code_cave.h"
+#include "elf_code_cave.h"
 #include "elf_functions.h"
 #include "elf_allocation.h"
-#include "packing_method_elf.h"
+#include "elf_packing_method.h"
 #include "loader_functions.h"
 
 #include "log.h"
 
 uint64_t loader_offset;
 
-int find_cave_section_index(t_elf *elf) {
+int find_elf_code_cave_index(t_elf *elf) {
     for(int i = 0; i < elf->elf_header->e_shnum; i++) {
         if(elf->section_header[i].sh_type == SHT_NOBITS) {
             continue;
@@ -30,10 +30,10 @@ int find_cave_section_index(t_elf *elf) {
         }
 
         if(code_cave_size > loader_size) {
-            int segment_index = find_segment_index_of_section(elf, i);
+            int segment_index = find_elf_segment_index_of_section(elf, i);
             if(elf->prog_header[segment_index].p_type == PT_LOAD) {
                 //printf("i: %d\n", i);
-                //printf("section_name: %s\n", get_section_name(elf, i));
+                //printf("section_name: %s\n", find_elf_section_name(elf, i));
                 //printf("cavity_size : %d\n", code_cave_size);
                 return i;
             }
@@ -43,24 +43,24 @@ int find_cave_section_index(t_elf *elf) {
     return -1;
 }
 
-int set_new_segment_values_cave(t_elf *elf, int segment_index) {
+int set_new_elf_cave_segment_values(t_elf *elf, int segment_index) {
     elf->prog_header[segment_index].p_memsz += loader_size;
     elf->prog_header[segment_index].p_filesz += loader_size;
 
-    add_segment_permission(elf, segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
-    add_segment_permission(elf, segment_index, PF_X); // NOLINT(hicpp-signed-bitwise)
+    add_elf_segment_permission(elf, segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
+    add_elf_segment_permission(elf, segment_index, PF_X); // NOLINT(hicpp-signed-bitwise)
 
-    int text_segment_index = find_text_segment(elf);
+    int text_segment_index = find_elf_text_segment(elf);
     if(text_segment_index == -1) {
         log_error("Couldn't find .text segment");
         return -1;
     }
-    add_segment_permission(elf, text_segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
+    add_elf_segment_permission(elf, text_segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
 
     return 1;
 }
 
-int insert_loader(t_elf *elf, int section_index, int old_section_size) {
+int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) {
     char *new_section_data = realloc(elf->section_data[section_index], old_section_size + loader_size);
     if(new_section_data == NULL) {
         log_error("realloc() failure");
@@ -80,27 +80,27 @@ int insert_loader(t_elf *elf, int section_index, int old_section_size) {
     return 1;
 }
 
-int code_cave_injection(t_elf *elf) {
-    int section_cave_index = find_cave_section_index(elf);
+int elf_code_cave_injection(t_elf *elf) {
+    int section_cave_index = find_elf_code_cave_index(elf);
     if(section_cave_index == -1) {
         log_error("Couldn't find any code cave in this ELF");
         return -1;
     }
     method_config.concerned_section = section_cave_index;
 
-    int segment_index = find_segment_index_of_section(elf, section_cave_index);
+    int segment_index = find_elf_segment_index_of_section(elf, section_cave_index);
     if(segment_index == -1) {
         log_error("Couldn't find segment index");
         return -1;
     }
 
-    if(set_new_segment_values_cave(elf, segment_index) == -1) {
+    if(set_new_elf_cave_segment_values(elf, segment_index) == -1) {
         log_error("Error during segment values modification");
         return -1;
     }
 
     int old_section_size = elf->section_header[section_cave_index].sh_size;
-    if(insert_loader(elf, section_cave_index, old_section_size) == -1) {
+    if(elf_cave_insert_loader(elf, section_cave_index, old_section_size) == -1) {
         log_error("Error during Loader insertion");
         return -1;
     }

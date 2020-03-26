@@ -3,12 +3,12 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "pack_elf.h"
+#include "elf_packing.h"
 #include "elf_allocation.h"
 #include "file_functions.h"
-#include "encrypt_elf.h"
-#include "write_elf.h"
-#include "packing_method_elf.h"
+#include "elf_encryption.h"
+#include "elf_writing.h"
+#include "elf_packing_method.h"
 
 #include "log.h"
 
@@ -59,7 +59,7 @@ int pack_elf(char *file, char *cipher, char *packing_method, char *output) {
     }
 
     log_info("Packing using specified method ...");
-    if(pack_using_method(elf, packing_method) == -1) {
+    if(elf_pack_using_method(elf, packing_method) == -1) {
         log_error("Error during ELF packing");
         return -1;
     }

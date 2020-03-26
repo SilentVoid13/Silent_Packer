@@ -3,7 +3,7 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "write_pe.h"
+#include "pe_writing.h"
 #include "pe_allocation.h"
 #include "file_functions.h"
 

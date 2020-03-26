@@ -3,10 +3,10 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "write_elf.h"
+#include "elf_writing.h"
 #include "elf_allocation.h"
 #include "file_functions.h"
-#include "packing_method_elf.h"
+#include "elf_packing_method.h"
 #include "loader_functions.h"
 
 #include "log.h"

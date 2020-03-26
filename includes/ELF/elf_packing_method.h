@@ -14,6 +14,6 @@
 
 #include "packing_method.h"
 
-int pack_using_method(t_elf *elf, char *packing_method);
+int elf_pack_using_method(t_elf *elf, char *packing_method);
 
 #endif //SILENT_CRYPT_PACKING_METHOD_ELF_H

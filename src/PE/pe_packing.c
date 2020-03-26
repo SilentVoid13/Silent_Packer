@@ -3,12 +3,12 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "pack_pe.h"
+#include "pe_packing.h"
 #include "pe_allocation.h"
 #include "file_functions.h"
-#include "write_pe.h"
-#include "packing_method_pe.h"
-#include "encrypt_pe.h"
+#include "pe_writing.h"
+#include "pe_packing_method.h"
+#include "pe_encryption.h"
 
 #include "log.h"
 
@@ -40,7 +40,7 @@ int pack_pe(char *file, char *cipher, char *packing_method, char *output) {
     }
 
     log_info("Packing using specified method ...");
-    if(pack_using_method_pe(pe, packing_method) == -1) {
+    if(pe_pack_using_method(pe, packing_method) == -1) {
         log_error("Error during ELF packing");
         return -1;
     }
