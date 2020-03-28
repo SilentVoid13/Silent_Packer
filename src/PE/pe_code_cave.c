@@ -21,7 +21,6 @@ int find_pe_code_cave_index(t_pe64 *pe) {
             //print_pe_section_info(pe, i);
 
             if(code_cave_size > loader_size) {
-                printf("code_cave_size: %ld\n", code_cave_size);
                 return i;
             }
         }
@@ -37,7 +36,6 @@ int set_new_pe_cave_section_values(t_pe64 *pe, int section_index) {
     // TODO: Change this to use mprotect in the loader
 
     int text_section_index = find_pe_text_section(pe);
-    printf("text_section_index : %d\n", text_section_index);
     if(text_section_index == -1) {
         log_error("Couldn't find .text segment");
         return -1;
@@ -61,7 +59,6 @@ int pe_cave_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
 
     // For ASM
     loader_offset = pe->section_header[section_index].VirtualAddress + old_section_size;
-    printf("loader_offset : %lx\n", loader_offset);
 
     char *loader = patch_loader();
     if(loader == NULL) {
@@ -79,8 +76,6 @@ int pe_code_cave_injection(t_pe64 *pe) {
         log_error("Couldn't find any code cave in this PE file");
         return -1;
     }
-
-    printf("Section_cave_index : %d\n", section_cave_index);
 
     int old_section_size = pe->section_header[section_cave_index].Misc.VirtualSize;
     if(set_new_pe_cave_section_values(pe, section_cave_index) == -1) {

@@ -34,10 +34,12 @@ loader_entry_point:
     lea r12, [rel loader_entry_point]
     sub r12, [rel info_offset]
 
-	mov	rdi, 1
+    ; sys_write
+    mov rax, 1
+    ; register order : rdi, rsi, rdx, rcx, r8, r9
+	mov	rdi, rax
 	lea	rsi, [rel msg]
 	mov	rdx, msg_len
-	mov	rax, rdi
 	syscall
 
 	jmp	start_unpacking

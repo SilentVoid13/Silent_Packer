@@ -3,7 +3,6 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include <PE/pe_struct.h>
 #include "pe_struct.h"
 #include "pe_section_insertion.h"
 #include "pe_allocation.h"
@@ -79,7 +78,6 @@ int add_new_pe_section_data(t_pe64 *pe) {
         log_error("Error during loader patching");
         return -1;
     }
-    //pe->section_data[sections_count-1] = loader;
     char *new_section = malloc(pe->section_header[sections_count-1].SizeOfRawData);
     memset(new_section, 0, pe->section_header[sections_count-1].SizeOfRawData);
     memcpy(new_section, loader, loader_size);
