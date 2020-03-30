@@ -30,7 +30,6 @@ int find_pe_code_cave_index(t_pe64 *pe) {
 }
 
 int set_new_pe_cave_section_values(t_pe64 *pe, int section_index) {
-    // TODO: Maybe add PhysicalSize ?
     pe->section_header[section_index].Misc.VirtualSize += loader_size;
 
     // TODO: Change this to use mprotect in the loader

@@ -81,8 +81,8 @@ int main(int argc, char** argv) {
                 display_argtable_help(progname, argtable);
             }
 
-            //pack_elf((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
-            pack_pe((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+            pack_elf((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+            //pack_pe((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
         }
         else {
             display_argtable_help(progname, argtable);

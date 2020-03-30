@@ -21,7 +21,6 @@ extern size_t loader_size;
 extern size_t infos_size;
 extern void loader_entry_point(void);
 
-
 extern uint64_t text_data_size;
 extern uint64_t text_entry_point;
 extern uint64_t cipher_key;

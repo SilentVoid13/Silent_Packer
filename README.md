@@ -18,7 +18,7 @@ You can find a more detailed stackoverflow post [here](https://reverseengineerin
 
 ## File formats
 
-Silent_Crypt currently supports the following file formats :
+Silent_Crypt currently support the following file formats :
 
 - ELF64
 - PE32+
@@ -27,7 +27,7 @@ Support for PE32 and ELF32 should arrive soon.
 
 ## Cipher methods
 
-Silent_Crypt currently supports the following cipher methods :
+Silent_Crypt currently support the following cipher methods :
 
 - XOR
 
@@ -35,13 +35,13 @@ Support for AES encryption should arrive soon.
 
 ## Encryption methods
 
-Silent_Crypt currently supports the following encryption methods :
+Silent_Crypt currently support the following encryption methods :
 
 - Section Insertion
 - Code Cave
 - Silvio Text Infection (only for ELF files)
 
-For an explanation on these methods work, see the [METHODS](https://github.com/SilentVoid13/Silent_Crypt/blob/master/METHODS.md) file.
+For a basic explanation on how does these methods work, see the [METHODS](https://github.com/SilentVoid13/Silent_Crypt/blob/master/METHODS.md) file.
 
 ## Usage
 

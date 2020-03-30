@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include <PE/pe_struct.h>
 #include "pe_encryption.h"
+#include "pe_struct.h"
 #include "cipher_functions.h"
 #include "pe_allocation.h"
 #include "pe_functions.h"

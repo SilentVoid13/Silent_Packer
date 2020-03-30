@@ -39,22 +39,6 @@ int find_last_elf_segment_of_type(t_elf *elf, unsigned int p_type) {
     return index;
 }
 
-void add_elf_segment_permission(t_elf *elf, int segment_index, int permission) {
-    elf->prog_header[segment_index].p_flags |= permission; // NOLINT(hicpp-signed-bitwise)
-}
-
-int find_last_elf_section_of_segment(t_elf *elf, int segment_index) {
-    int index = -1;
-    Elf64_Phdr *program_header = elf->prog_header + segment_index;
-    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        Elf64_Shdr	*section_header = elf->section_header + i;
-        if(section_header->sh_addr + section_header->sh_size >= program_header->p_vaddr + program_header->p_memsz) {
-            index = i;
-        }
-    }
-    return index;
-}
-
 // Find last section from specified segment index
 int find_last_elf_section_from_segment(t_elf *elf, int segment_index) {
     int index = -1;
@@ -118,4 +102,8 @@ int find_elf_section_index(t_elf *elf, char *section_name) {
         }
     }
     return -1;
+}
+
+void add_elf_segment_permission(t_elf *elf, int segment_index, int permission) {
+    elf->prog_header[segment_index].p_flags |= permission; // NOLINT(hicpp-signed-bitwise)
 }

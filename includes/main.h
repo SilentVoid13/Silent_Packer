@@ -10,4 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
+void display_argtable_help(char *progname, void **argtable);
+
 #endif //SILENT_CRYPT_MAIN_H

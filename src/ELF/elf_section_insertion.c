@@ -10,19 +10,6 @@
 
 #include "log.h"
 
-Elf64_Shdr new_section = {
-        .sh_name = 0,
-        .sh_type = SHT_PROGBITS,
-        .sh_flags = SHF_EXECINSTR | SHF_ALLOC, // NOLINT(hicpp-signed-bitwise)
-        .sh_addr = 0,
-        .sh_offset = 0,
-        .sh_size = 0,
-        .sh_link = 0,
-        .sh_info = 0,
-        .sh_addralign = 16,
-        .sh_entsize = 0,
-};
-
 int set_new_elf_section_string_table(t_elf *elf) {
     char *new_string_table;
 
@@ -30,8 +17,6 @@ int set_new_elf_section_string_table(t_elf *elf) {
     size_t section_name_length = strlen(section_name);
 
     int section_string_table_index = elf->elf_header->e_shstrndx;
-
-    printf("section_string_table_index: %d\n", section_string_table_index);
 
     size_t new_string_table_size = elf->section_header[section_string_table_index].sh_size + section_name_length + 1;
     new_string_table = realloc(elf->section_data[section_string_table_index], new_string_table_size);
@@ -203,7 +188,7 @@ int elf_insert_section(t_elf *elf) {
         return -1;
     }
 
-    int last_loadable_section_index = find_last_elf_section_of_segment(elf, last_pt_load_index);
+    int last_loadable_section_index = find_last_elf_section_from_segment(elf, last_pt_load_index);
     if(last_loadable_section_index == -1) {
         log_error("Couldn't find the last Section index");
         return -1;

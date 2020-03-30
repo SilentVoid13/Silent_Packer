@@ -32,6 +32,14 @@ typedef struct s_pe64 {
     char **section_data;
 } t_pe64;
 
+
+int allocate_pe_dos_header(t_pe64 *pe, void *file_data, size_t file_data_size);
+int allocate_pe_dos_stub(t_pe64 *pe, void *file_data);
+int allocate_pe_pe_header(t_pe64 *pe, void *file_data, size_t file_data_size);
+int allocate_pe_sections_headers(t_pe64 *pe, void *file_data, size_t file_data_size);
+int allocate_pe_sections_data(t_pe64 *pe, void *file_data, size_t file_data_size);
+void print_pe_info(t_pe64 *pe);
+
 int allocate_pe(t_pe64 **pe, void *file_data, size_t file_data_size);
 
 #endif //SILENT_CRYPT_PE_ALLOCATION_H

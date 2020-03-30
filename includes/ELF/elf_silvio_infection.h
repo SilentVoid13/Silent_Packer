@@ -13,6 +13,11 @@
 #include "ELF/elf_allocation.h"
 
 #define PAGE_SIZE64 0x2000
+#define PAGE_SIZE32 4096
+
+int set_new_elf_silvio_segment_values(t_elf *elf, int text_segment_index);
+int set_new_elf_silvio_section_values(t_elf *elf, int last_section_index);
+int elf_silvio_insert_loader(t_elf *elf, int section_index);
 
 int elf_silvio_infect(t_elf *elf);
 

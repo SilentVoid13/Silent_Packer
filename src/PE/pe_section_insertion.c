@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "pe_struct.h"
 #include "pe_section_insertion.h"
+#include "pe_struct.h"
 #include "pe_allocation.h"
 #include "pe_functions.h"
 #include "loader_functions.h"
