@@ -1,0 +1,3 @@
+[submodule "src/utilities/Silent_Log"]
+	path = src/utilities/Silent_Log
+	url = https://github.com/SilentVoid13/Silent_Log.git
