@@ -122,20 +122,28 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
     }
     memset(*elf, 0, t_elf_size);
 
+    log_verbose("Allocating ELF Header ...");
+
     if(allocate_elf_elf_header(*elf, file_data, file_data_size) == -1) {
         log_error("Error during ELF Header allocation");
         return -1;
     }
+
+    log_verbose("Allocating Program Header ...");
 
     if(allocate_elf_program_header(*elf, file_data, file_data_size) == -1) {
         log_error("Error during Program Header allocation");
         return -1;
     }
 
+    log_verbose("Allocating Sections Headers ...");
+
     if(allocate_elf_sections_header(*elf, file_data, file_data_size) == -1) {
         log_error("Error during Section Header allocation");
         return -1;
     }
+
+    log_verbose("Allocating Sections Data ...");
 
     if(allocate_elf_sections_data(*elf, file_data, file_data_size) == -1) {
         log_error("Error during Section Data allocation");

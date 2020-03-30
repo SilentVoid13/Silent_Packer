@@ -15,6 +15,10 @@
 #define IMAGE_SIZEOF_SHORT_NAME 8
 
 #define DOSMAG 0x5a4d
+
+#define STR_DOSMAG "MZ"
+#define SSTR_DOSMAG 2
+
 #define PEMAG 0x00004550
 
 #define IMAGE_FILE_RELOCS_STRIPPED 0x0001 /**< No relocation info. */

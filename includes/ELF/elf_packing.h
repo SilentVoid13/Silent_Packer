@@ -15,6 +15,6 @@
 #include <fcntl.h>
 #include <mhash.h>
 
-int pack_elf(char *file, char *cipher, char *packing_method, char *output);
+int pack_elf(char *file, char *file_data, size_t file_data_size, char *cipher, char *packing_method, char *output);
 
 #endif //SILENT_CRYPT_PACK_ELF_H

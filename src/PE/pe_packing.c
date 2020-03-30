@@ -12,16 +12,7 @@
 
 #include "log.h"
 
-int pack_pe(char *file, char *cipher, char *packing_method, char *output) {
-    void *file_data;
-    size_t file_data_size;
-
-    log_info("Allocating file in memory ...");
-    if(allocate_file(file, &file_data, &file_data_size) == -1) {
-        log_error("Error during file allocation");
-        return -1;
-    }
-
+int pack_pe(char *file, char *file_data, size_t file_data_size, char *cipher, char *packing_method, char *output) {
     log_info("Allocating PE in memory ...");
     t_pe64 *pe = NULL;
     if(allocate_pe(&pe, file_data, file_data_size) == -1) {
@@ -56,6 +47,8 @@ int pack_pe(char *file, char *cipher, char *packing_method, char *output) {
         log_error("Error during new ELF writing");
         return -1;
     }
+
+    log_success("File %s packed into %s !", file, filename);
 
     return 1;
 }

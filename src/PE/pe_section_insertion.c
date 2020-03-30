@@ -95,10 +95,14 @@ int pe_insert_section(t_pe64 *pe) {
     }
     add_pe_section_permission(pe, text_section_index, IMAGE_SCN_MEM_WRITE);
 
+    log_verbose("Creating new section ...");
+
     if(add_new_pe_section_header(pe) == -1) {
         log_error("Error during new Section Header insertion");
         return -1;
     }
+
+    log_verbose("Setting new headers values ...");
 
     if(set_new_pe_header_values(pe) == -1) {
         log_error("Couldn't set new PE Header values");
@@ -109,6 +113,8 @@ int pe_insert_section(t_pe64 *pe) {
         log_error("Error during new Section Data insertion");
         return -1;
     }
+
+    log_verbose("Setting new PE entry point ...");
 
     set_new_pe_entry_to_section(pe, pe->pe_header->FileHeader.NumberOfSections-1);
 

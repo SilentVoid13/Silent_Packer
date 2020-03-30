@@ -10,6 +10,19 @@
 
 #include "log.h"
 
+Elf64_Shdr new_section = {
+        .sh_name = 0,
+        .sh_type = SHT_PROGBITS,
+        .sh_flags = SHF_EXECINSTR | SHF_ALLOC, // NOLINT(hicpp-signed-bitwise)
+        .sh_addr = 0,
+        .sh_offset = 0,
+        .sh_size = 0,
+        .sh_link = 0,
+        .sh_info = 0,
+        .sh_addralign = 16,
+        .sh_entsize = 0,
+};
+
 int set_new_elf_section_string_table(t_elf *elf) {
     char *new_string_table;
 
@@ -194,6 +207,8 @@ int elf_insert_section(t_elf *elf) {
         return -1;
     }
 
+    log_verbose("Creating new section ...");
+
     if(elf_section_create_new_section(elf, last_pt_load_index, last_loadable_section_index) == -1) {
         log_error("Error during new Section creation");
         return -1;
@@ -204,6 +219,7 @@ int elf_insert_section(t_elf *elf) {
 
     method_config.concerned_section = last_loadable_section_index;
 
+    log_verbose("Setting new segment values ...");
 
     // Set new segment size with our new section included
     size_t new_segment_size = elf->prog_header[last_pt_load_index].p_memsz + loader_size;
@@ -212,6 +228,8 @@ int elf_insert_section(t_elf *elf) {
 
     // Set all pt_loader permissions on RWX (pretty ugly)
     set_new_elf_section_pt_loader_permissions(elf);
+
+    log_verbose("Setting new ELF entry point ...");
 
     // Add our new section as the new elf entry point
     set_new_elf_entry_to_section(elf, last_loadable_section_index);

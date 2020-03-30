@@ -4,6 +4,8 @@
 //
 
 #include "file_functions.h"
+#include "elf_allocation.h"
+#include "pe_struct.h"
 
 #include "log.h"
 
@@ -53,5 +55,23 @@ void add_zero_padding(int fd, size_t end_offset) {
     char c = 0;
     while(offset < end_offset) {
         write_to_file(fd, &c, sizeof(c));
+    }
+}
+
+int check_magic_bytes(char *file_data, size_t file_data_size) {
+    // TODO: Random value see for a coherent value
+    if(file_data_size < 50) {
+        log_error("Invalid file size");
+        return UNKNOWN_FILE;
+    }
+
+    if(strncmp(file_data, ELFMAG, SELFMAG) == 0) {
+        return ELF_FILE;
+    }
+    else if(strncmp(file_data, STR_DOSMAG, SSTR_DOSMAG) == 0) {
+        return PE_FILE;
+    }
+    else {
+        return UNKNOWN_FILE;
     }
 }

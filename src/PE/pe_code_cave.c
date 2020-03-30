@@ -70,11 +70,16 @@ int pe_cave_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
 }
 
 int pe_code_cave_injection(t_pe64 *pe) {
+
+    log_verbose("Finding a code cave ...");
+
     int section_cave_index = find_pe_code_cave_index(pe);
     if(section_cave_index == -1) {
         log_error("Couldn't find any code cave in this PE file");
         return -1;
     }
+
+    log_verbose("Setting new section values ...");
 
     int old_section_size = pe->section_header[section_cave_index].Misc.VirtualSize;
     if(set_new_pe_cave_section_values(pe, section_cave_index) == -1) {
@@ -82,10 +87,14 @@ int pe_code_cave_injection(t_pe64 *pe) {
         return -1;
     }
 
+    log_verbose("Inserting the loader inside the code cave ...");
+
     if(pe_cave_insert_loader(pe, section_cave_index, old_section_size) == -1) {
         log_error("Error during Loader insertion");
         return -1;
     }
+
+    log_verbose("Setting new PE entry point ...");
 
     uint32_t loader_addr = pe->section_header[section_cave_index].VirtualAddress + old_section_size;
     set_new_pe_entry_to_addr(pe, loader_addr, section_cave_index, old_section_size);

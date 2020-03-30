@@ -4,6 +4,7 @@
 #include "main.h"
 #include "elf_packing.h"
 #include "pe_packing.h"
+#include "file_functions.h"
 
 #include "argtable3.h"
 #include "log.h"
@@ -81,8 +82,25 @@ int main(int argc, char** argv) {
                 display_argtable_help(progname, argtable);
             }
 
-            pack_elf((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
-            //pack_pe((char *) file->filename[0], (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+            void *file_data;
+            size_t file_data_size;
+
+            log_info("Allocating file in memory ...");
+            if(allocate_file((char *) file->filename[0], &file_data, &file_data_size) == -1) {
+                log_error("Error during file allocation");
+                return -1;
+            }
+
+            int file_type = check_magic_bytes(file_data, file_data_size);
+            if(file_type == ELF_FILE) {
+                pack_elf((char *) file->filename[0], file_data, file_data_size, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+            }
+            else if(file_type == PE_FILE) {
+                pack_pe((char *) file->filename[0], file_data, file_data_size, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+            }
+            else {
+                log_error("Invalid file type");
+            }
         }
         else {
             display_argtable_help(progname, argtable);

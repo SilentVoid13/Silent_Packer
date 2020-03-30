@@ -81,6 +81,9 @@ int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) 
 }
 
 int elf_code_cave_injection(t_elf *elf) {
+
+    log_verbose("Finding the code cave ...");
+
     int section_cave_index = find_elf_code_cave_index(elf);
     if(section_cave_index == -1) {
         log_error("Couldn't find any code cave in this ELF");
@@ -94,10 +97,14 @@ int elf_code_cave_injection(t_elf *elf) {
         return -1;
     }
 
+    log_verbose("Setting new segment values ...");
+
     if(set_new_elf_cave_segment_values(elf, segment_index) == -1) {
         log_error("Error during segment values modification");
         return -1;
     }
+
+    log_verbose("Inserting the loader inside the code cave ...");
 
     int old_section_size = elf->section_header[section_cave_index].sh_size;
     if(elf_cave_insert_loader(elf, section_cave_index, old_section_size) == -1) {
@@ -105,10 +112,9 @@ int elf_code_cave_injection(t_elf *elf) {
         return -1;
     }
 
+    log_verbose("Setting new ELF entry point ...");
+
     Elf64_Addr loader_addr = elf->section_header[section_cave_index].sh_addr + old_section_size;
-
-    printf("loader_addr : %lx\n", loader_addr);
-
     set_new_elf_entry_to_addr(elf, loader_addr, section_cave_index, old_section_size);
 
     return 1;

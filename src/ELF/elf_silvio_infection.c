@@ -67,6 +67,8 @@ int elf_silvio_infect(t_elf *elf) {
         return -1;
     }
 
+    log_verbose("Setting new segment values ...");
+
     set_new_elf_silvio_segment_values(elf, text_segment_index);
 
     int last_section_index = find_last_elf_section_from_segment(elf, text_segment_index);
@@ -79,6 +81,8 @@ int elf_silvio_infect(t_elf *elf) {
     elf->elf_header->e_shoff += PAGE_SIZE64;
     set_new_elf_silvio_section_values(elf, last_section_index);
 
+    log_verbose("Inserting the loader ...");
+
     if(elf_silvio_insert_loader(elf, last_section_index) == -1) {
         log_error("Loader insertion failed");
         return -1;
@@ -86,6 +90,8 @@ int elf_silvio_infect(t_elf *elf) {
 
     // Add write permission to be able to decrypt it
     add_elf_segment_permission(elf, text_segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
+
+    log_verbose("Setting new ELF entry point ...");
 
     // Set jump address + new elf entry point
     set_new_elf_entry_to_addr(elf, loader_addr, last_section_index, old_section_size);
