@@ -12,10 +12,12 @@
 
 #include "log.h"
 
-int pack_pe(char *file, char *file_data, size_t file_data_size, char *cipher, char *packing_method, char *output) {
+int pack_pe(char *file, char *file_data, size_t file_data_size, int arch, char *cipher, char *packing_method, char *output) {
+    log_verbose("Detected arch : x%d", arch);
     log_info("Allocating PE in memory ...");
-    t_pe64 *pe = NULL;
-    if(allocate_pe(&pe, file_data, file_data_size) == -1) {
+
+    t_pe *pe = NULL;
+    if (allocate_pe(&pe, file_data, file_data_size, arch) == -1) {
         log_error("Error during PE allocation");
         return -1;
     }
@@ -23,7 +25,6 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *cipher, ch
     // De-allocate mapped file as we don't need it anymore
     munmap(file_data, file_data_size);
 
-    // TODO: Encrypt + pack stub
     log_info("Encrypting .text section ...");
     if(encrypt_pe(pe, cipher) == -1) {
         log_error("Error during ELF encryption");
@@ -52,3 +53,4 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *cipher, ch
 
     return 1;
 }
+

@@ -20,11 +20,21 @@ int encrypt_elf(t_elf *elf, char *cipher) {
 
     log_verbose("Got .text section index : %d", text_section_index);
 
-    char *text_data = elf->section_data[text_section_index];
+    char *text_data;
+    if(elf->s_type == ELF32) {
+        text_data = ((t_elf32 *)elf)->section_data[text_section_index];
 
-    // Setting global variables
-    text_data_size = elf->section_header[text_section_index].sh_size;
-    text_entry_point = elf->section_header[text_section_index].sh_addr;
+        // Setting global variables
+        text_data_size = ((t_elf32 *)elf)->section_header[text_section_index].sh_size;
+        text_entry_point = ((t_elf32 *)elf)->section_header[text_section_index].sh_addr;
+    }
+    else {
+        text_data = ((t_elf64 *)elf)->section_data[text_section_index];
+
+        // Setting global variables
+        text_data_size = ((t_elf64 *)elf)->section_header[text_section_index].sh_size;
+        text_entry_point = ((t_elf64 *)elf)->section_header[text_section_index].sh_addr;
+    }
 
     log_verbose("Generating random key ...");
     cipher_key = generate_random_key();

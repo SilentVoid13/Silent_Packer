@@ -39,7 +39,7 @@ s_elf struct :
 - [ ] elf_header (elf_allocation)
 - [ ] prog_header (elf_allocation)
 - [ ] section_header (elf_allocation)
-- [ ] section_data[i]  (elf_allocation)
+- [ ] section_data\[i\]  (elf_allocation)
 - [ ] section_data\[i\]\[i\] (elf_allocation)
 
 - [ ] loader (loader_functions)
@@ -66,6 +66,6 @@ s_elf struct :
 - [ ] dos_stub (pe_allocation)
 - [ ] pe_header (pe_allocation)
 - [ ] section_header (pe_allocation)
-- [ ] section_data[i] (pe_allocation)
+- [ ] section_data\[i\] (pe_allocation)
 - [ ] section_data\[i\]\[i\] (pe_allocation)
 - [ ] loader (loader_functions)

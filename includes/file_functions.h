@@ -17,11 +17,17 @@
 
 #define ELF_FILE        1
 #define PE_FILE         2
-#define UNKNOWN_FILE    -1
+#define UNKNOWN_FILE    (-1)
+
+#define x32_ARCH        32
+#define x64_ARCH        64
+#define UNKNOWN_ARCH    (-1)
 
 int allocate_file(char *file, void **file_data, size_t *file_data_size);
 int write_to_file(int fd, void *data, size_t data_size);
 void add_zero_padding(int fd, size_t end_offset);
 int check_magic_bytes(char *file_data, size_t file_data_size);
+int get_elf_arch(const char *file_data, size_t file_data_size);
+int get_pe_arch(const char *file_data, size_t file_data_size);
 
 #endif //SILENT_CRYPT_FILE_FUNCTIONS_H

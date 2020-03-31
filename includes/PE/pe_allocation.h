@@ -12,34 +12,47 @@
 
 #include "pe_struct.h"
 
+typedef struct s_pe {
+    enum{PE32, PE64} s_type;
+} t_pe;
+
 typedef struct s_pe32 {
+    t_pe type_header;
     IMAGE_DOS_HEADER *dos_header;
     char *dos_stub;
     IMAGE_NT_HEADERS32 *pe_header;
-    // Array of sections headers
     IMAGE_SECTION_HEADER *section_header;
-    // Array of bytes for each section
     char **section_data;
 } t_pe32;
 
 typedef struct s_pe64 {
+    t_pe type_header;
     IMAGE_DOS_HEADER *dos_header;
     char *dos_stub;
     IMAGE_NT_HEADERS64 *pe_header;
-    // Array of sections headers
     IMAGE_SECTION_HEADER *section_header;
-    // Array of bytes for each section
     char **section_data;
 } t_pe64;
 
+/*
+ * Can be a solution too
+typedef struct s_pe {
+    enum{PE32, PE64} s_type;
 
-int allocate_pe_dos_header(t_pe64 *pe, void *file_data, size_t file_data_size);
-int allocate_pe_dos_stub(t_pe64 *pe, void *file_data);
-int allocate_pe_pe_header(t_pe64 *pe, void *file_data, size_t file_data_size);
-int allocate_pe_sections_headers(t_pe64 *pe, void *file_data, size_t file_data_size);
-int allocate_pe_sections_data(t_pe64 *pe, void *file_data, size_t file_data_size);
-void print_pe_info(t_pe64 *pe);
+    union {
+        t_pe64 pe64;
+        t_pe32 pe32;
+    };
+} t_pe;
+*/
 
-int allocate_pe(t_pe64 **pe, void *file_data, size_t file_data_size);
+int allocate_pe_dos_header(t_pe *pe, void *file_data, size_t file_data_size);
+int allocate_pe_dos_stub(t_pe *pe, void *file_data);
+int allocate_pe_pe_header(t_pe *pe, void *file_data, size_t file_data_size);
+int allocate_pe_sections_headers(t_pe *pe, void *file_data, size_t file_data_size);
+int allocate_pe_sections_data(t_pe *pe, void *file_data, size_t file_data_size);
+void print_pe_info(t_pe *pe);
+
+int allocate_pe(t_pe **pe, void *file_data, size_t file_data_size, int arch);
 
 #endif //SILENT_CRYPT_PE_ALLOCATION_H

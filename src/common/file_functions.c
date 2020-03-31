@@ -59,7 +59,7 @@ void add_zero_padding(int fd, size_t end_offset) {
 }
 
 int check_magic_bytes(char *file_data, size_t file_data_size) {
-    // TODO: Random value see for a coherent value
+    // TODO: Random value - See for a coherent value
     if(file_data_size < 50) {
         log_error("Invalid file size");
         return UNKNOWN_FILE;
@@ -73,5 +73,44 @@ int check_magic_bytes(char *file_data, size_t file_data_size) {
     }
     else {
         return UNKNOWN_FILE;
+    }
+}
+
+int get_elf_arch(const char *file_data, size_t file_data_size) {
+    // TODO: Maybe improve this
+    if(file_data_size < sizeof(Elf32_Ehdr)) {
+        log_error("Invalid file size");
+        return UNKNOWN_ARCH;
+    }
+
+    if(file_data[EI_CLASS] == ELFCLASS32) {
+        return x32_ARCH;
+    }
+    else if(file_data[EI_CLASS] == ELFCLASS64) {
+        return x64_ARCH;
+    }
+    else {
+        return UNKNOWN_ARCH;
+    }
+}
+
+int get_pe_arch(const char *file_data, size_t file_data_size) {
+    // TODO: Maybe improve this
+    if(file_data_size < sizeof(IMAGE_DOS_HEADER) + DOS_STUB_SIZE + sizeof(IMAGE_NT_HEADERS32)) {
+        log_error("Invalid file size");
+        return UNKNOWN_ARCH;
+    }
+
+    size_t machine_type_offset = sizeof(IMAGE_DOS_HEADER) + DOS_STUB_SIZE + sizeof(uint32_t) + sizeof(IMAGE_FILE_HEADER);
+    uint16_t arch_value = *((uint16_t *)(file_data+machine_type_offset));
+
+    if(arch_value == PE32MAG) {
+        return x32_ARCH;
+    }
+    else if(arch_value == PE64MAG) {
+        return x64_ARCH;
+    }
+    else {
+        return UNKNOWN_ARCH;
     }
 }

@@ -32,11 +32,12 @@
  *
 */
 
-int pack_elf(char *file, char *file_data, size_t file_data_size, char *cipher, char *packing_method, char *output) {
-
+int pack_elf(char *file, char *file_data, size_t file_data_size, int arch, char *cipher, char *packing_method, char *output) {
+    log_verbose("Detected arch : x%d", arch);
     log_info("Allocating ELF in memory ...");
+
     t_elf *elf = NULL;
-    if(allocate_elf(&elf, file_data, file_data_size) == -1) {
+    if(allocate_elf(&elf, file_data, file_data_size, arch) == -1) {
         log_error("Error during ELF allocation");
         return -1;
     }

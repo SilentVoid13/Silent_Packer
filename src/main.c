@@ -93,11 +93,29 @@ int main(int argc, char** argv) {
 
             int file_type = check_magic_bytes(file_data, file_data_size);
             if(file_type == ELF_FILE) {
-                pack_elf((char *) file->filename[0], file_data, file_data_size, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+                int arch = get_elf_arch(file_data, file_data_size);
+                if(arch == UNKNOWN_ARCH) {
+                    log_error("Couldn't detect the architecture of the file");
+                    return -1;
+                }
+
+                int p_status = pack_elf((char *) file->filename[0], file_data, file_data_size, arch, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+                if(p_status == -1) {
+                    log_error("An error occured during the ELF packing");
+                }
             }
             else if(file_type == PE_FILE) {
-                pack_pe((char *) file->filename[0], file_data, file_data_size, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
-            }
+                int arch = get_pe_arch(file_data, file_data_size);
+                if(arch == UNKNOWN_ARCH) {
+                    log_error("Couldn't detect the architecture of the file");
+                    return -1;
+                }
+
+                int p_status = pack_pe((char *) file->filename[0], file_data, file_data_size, arch, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+                if(p_status == -1) {
+                    log_error("An error occured during the PE packing");
+                }
+             }
             else {
                 log_error("Invalid file type");
             }

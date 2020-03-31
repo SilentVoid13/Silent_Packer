@@ -14,28 +14,53 @@
 uint64_t loader_offset;
 
 int find_elf_code_cave_index(t_elf *elf) {
-    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        if(elf->section_header[i].sh_type == SHT_NOBITS) {
-            continue;
-        }
+    if(elf->s_type == ELF32) {
+        for (int i = 0; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
+            if (((t_elf32 *)elf)->section_header[i].sh_type == SHT_NOBITS) {
+                continue;
+            }
+            unsigned int code_cave_size;
 
-        unsigned int code_cave_size;
+            // TODO: Maybe change that since it's relying on the fact that the section header is located after the section data (may not always be the case)
+            if (i == ((t_elf32 *)elf)->elf_header->e_shnum - 1) {
+                code_cave_size =
+                        ((t_elf32 *)elf)->elf_header->e_shoff - (((t_elf32 *)elf)->section_header[i].sh_offset + ((t_elf32 *)elf)->section_header[i].sh_size);
+            } else {
+                code_cave_size = ((t_elf32 *)elf)->section_header[i + 1].sh_offset -
+                                 (((t_elf32 *)elf)->section_header[i].sh_offset + ((t_elf32 *)elf)->section_header[i].sh_size);
+            }
 
-        // TODO: Maybe change that since it's relying on the fact that the section header is located after the section data (may not always be the case)
-        if(i == elf->elf_header->e_shnum-1) {
-            code_cave_size = elf->elf_header->e_shoff - (elf->section_header[i].sh_offset + elf->section_header[i].sh_size);
+            if (code_cave_size > loader_size) {
+                int segment_index = find_elf_segment_index_of_section(elf, i);
+                if (((t_elf32 *)elf)->prog_header[segment_index].p_type == PT_LOAD) {
+                    //printf("cavity_size : %d\n", code_cave_size);
+                    return i;
+                }
+            }
         }
-        else {
-            code_cave_size = elf->section_header[i + 1].sh_offset - (elf->section_header[i].sh_offset + elf->section_header[i].sh_size);
-        }
+    }
+    else {
+        for (int i = 0; i < ((t_elf64 *)elf)->elf_header->e_shnum; i++) {
+            if (((t_elf64 *)elf)->section_header[i].sh_type == SHT_NOBITS) {
+                continue;
+            }
+            unsigned int code_cave_size;
 
-        if(code_cave_size > loader_size) {
-            int segment_index = find_elf_segment_index_of_section(elf, i);
-            if(elf->prog_header[segment_index].p_type == PT_LOAD) {
-                //printf("i: %d\n", i);
-                //printf("section_name: %s\n", find_elf_section_name(elf, i));
-                //printf("cavity_size : %d\n", code_cave_size);
-                return i;
+            // TODO: Maybe change that since it's relying on the fact that the section header is located after the section data (may not always be the case)
+            if (i == ((t_elf64 *)elf)->elf_header->e_shnum - 1) {
+                code_cave_size =
+                        ((t_elf64 *)elf)->elf_header->e_shoff - (((t_elf64 *)elf)->section_header[i].sh_offset + ((t_elf64 *)elf)->section_header[i].sh_size);
+            } else {
+                code_cave_size = ((t_elf64 *)elf)->section_header[i + 1].sh_offset -
+                                 (((t_elf64 *)elf)->section_header[i].sh_offset + ((t_elf64 *)elf)->section_header[i].sh_size);
+            }
+
+            if (code_cave_size > loader_size) {
+                int segment_index = find_elf_segment_index_of_section(elf, i);
+                if (((t_elf64 *)elf)->prog_header[segment_index].p_type == PT_LOAD) {
+                    //printf("cavity_size : %d\n", code_cave_size);
+                    return i;
+                }
             }
         }
     }
@@ -44,8 +69,14 @@ int find_elf_code_cave_index(t_elf *elf) {
 }
 
 int set_new_elf_cave_segment_values(t_elf *elf, int segment_index) {
-    elf->prog_header[segment_index].p_memsz += loader_size;
-    elf->prog_header[segment_index].p_filesz += loader_size;
+    if(elf->s_type == ELF32) {
+        ((t_elf32 *)elf)->prog_header[segment_index].p_memsz += loader_size;
+        ((t_elf32 *)elf)->prog_header[segment_index].p_filesz += loader_size;
+    }
+    else {
+        ((t_elf64 *)elf)->prog_header[segment_index].p_memsz += loader_size;
+        ((t_elf64 *)elf)->prog_header[segment_index].p_filesz += loader_size;
+    }
 
     add_elf_segment_permission(elf, segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
     add_elf_segment_permission(elf, segment_index, PF_X); // NOLINT(hicpp-signed-bitwise)
@@ -61,14 +92,28 @@ int set_new_elf_cave_segment_values(t_elf *elf, int segment_index) {
 }
 
 int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) {
-    char *new_section_data = realloc(elf->section_data[section_index], old_section_size + loader_size);
-    if(new_section_data == NULL) {
-        log_error("realloc() failure");
-        return -1;
+    char *new_section_data;
+
+    if(elf->s_type == ELF32) {
+        new_section_data = realloc(((t_elf32 *)elf)->section_data[section_index], old_section_size + loader_size);
+        if (new_section_data == NULL) {
+            log_error("realloc() failure");
+            return -1;
+        }
+        ((t_elf32 *)elf)->section_data[section_index] = new_section_data;
+        // For ASM
+        loader_offset = ((t_elf32 *)elf)->section_header[section_index].sh_addr + old_section_size;
     }
-    elf->section_data[section_index] = new_section_data;
-    // For ASM
-    loader_offset = elf->section_header[section_index].sh_addr + old_section_size;
+    else {
+        new_section_data = realloc(((t_elf64 *)elf)->section_data[section_index], old_section_size + loader_size);
+        if (new_section_data == NULL) {
+            log_error("realloc() failure");
+            return -1;
+        }
+        ((t_elf64 *)elf)->section_data[section_index] = new_section_data;
+        // For ASM
+        loader_offset = ((t_elf64 *)elf)->section_header[section_index].sh_addr + old_section_size;
+    }
 
     char *loader = patch_loader();
     if(loader == NULL) {
@@ -106,7 +151,12 @@ int elf_code_cave_injection(t_elf *elf) {
 
     log_verbose("Inserting the loader inside the code cave ...");
 
-    int old_section_size = elf->section_header[section_cave_index].sh_size;
+    int old_section_size;
+    if(elf->s_type == ELF32)
+        old_section_size = ((t_elf32 *)elf)->section_header[section_cave_index].sh_size;
+    else
+        old_section_size = ((t_elf64 *)elf)->section_header[section_cave_index].sh_size;
+
     if(elf_cave_insert_loader(elf, section_cave_index, old_section_size) == -1) {
         log_error("Error during Loader insertion");
         return -1;
@@ -114,7 +164,12 @@ int elf_code_cave_injection(t_elf *elf) {
 
     log_verbose("Setting new ELF entry point ...");
 
-    Elf64_Addr loader_addr = elf->section_header[section_cave_index].sh_addr + old_section_size;
+    Elf64_Addr loader_addr;
+    if(elf->s_type == ELF32)
+        loader_addr = ((t_elf32 *)elf)->section_header[section_cave_index].sh_addr + old_section_size;
+    else
+        loader_addr = ((t_elf64 *)elf)->section_header[section_cave_index].sh_addr + old_section_size;
+
     set_new_elf_entry_to_addr(elf, loader_addr, section_cave_index, old_section_size);
 
     return 1;

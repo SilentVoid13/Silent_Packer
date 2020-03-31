@@ -11,17 +11,32 @@
 
 #include "log.h"
 
-int find_pe_code_cave_index(t_pe64 *pe) {
+int find_pe_code_cave_index(t_pe *pe) {
     size_t code_cave_size;
 
-    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections-1; i++) {
-        if(pe->section_header[i].SizeOfRawData > pe->section_header[i].Misc.VirtualSize) {
-            code_cave_size = pe->section_header[i].SizeOfRawData - pe->section_header[i].Misc.VirtualSize;
+    if(pe->s_type == PE32) {
+        for (int i = 0; i < ((t_pe32 *)pe)->pe_header->FileHeader.NumberOfSections - 1; i++) {
+            if (((t_pe32 *)pe)->section_header[i].SizeOfRawData > ((t_pe32 *)pe)->section_header[i].Misc.VirtualSize) {
+                code_cave_size = ((t_pe32 *)pe)->section_header[i].SizeOfRawData - ((t_pe32 *)pe)->section_header[i].Misc.VirtualSize;
 
-            //print_pe_section_info(pe, i);
+                //print_pe_section_info(pe, i);
 
-            if(code_cave_size > loader_size) {
-                return i;
+                if (code_cave_size > loader_size) {
+                    return i;
+                }
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < ((t_pe64 *)pe)->pe_header->FileHeader.NumberOfSections - 1; i++) {
+            if (((t_pe64 *)pe)->section_header[i].SizeOfRawData > ((t_pe64 *)pe)->section_header[i].Misc.VirtualSize) {
+                code_cave_size = ((t_pe64 *)pe)->section_header[i].SizeOfRawData - ((t_pe64 *)pe)->section_header[i].Misc.VirtualSize;
+
+                //print_pe_section_info(pe, i);
+
+                if (code_cave_size > loader_size) {
+                    return i;
+                }
             }
         }
     }
@@ -29,8 +44,11 @@ int find_pe_code_cave_index(t_pe64 *pe) {
     return -1;
 }
 
-int set_new_pe_cave_section_values(t_pe64 *pe, int section_index) {
-    pe->section_header[section_index].Misc.VirtualSize += loader_size;
+int set_new_pe_cave_section_values(t_pe *pe, int section_index) {
+    if(pe->s_type == PE32)
+        ((t_pe32 *)pe)->section_header[section_index].Misc.VirtualSize += loader_size;
+    else
+        ((t_pe64 *)pe)->section_header[section_index].Misc.VirtualSize += loader_size;
 
     // TODO: Change this to use mprotect in the loader
 
@@ -48,16 +66,31 @@ int set_new_pe_cave_section_values(t_pe64 *pe, int section_index) {
     return 1;
 }
 
-int pe_cave_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
-    char *new_section_data = realloc(pe->section_data[section_index], old_section_size + loader_size);
-    if(new_section_data == NULL) {
-        log_error("realloc() failure");
-        return -1;
-    }
-    pe->section_data[section_index] = new_section_data;
+int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
+    char *new_section_data;
 
-    // For ASM
-    loader_offset = pe->section_header[section_index].VirtualAddress + old_section_size;
+    if(pe->s_type == PE32) {
+        new_section_data = realloc(((t_pe32 *)pe)->section_data[section_index], old_section_size + loader_size);
+        if (new_section_data == NULL) {
+            log_error("realloc() failure");
+            return -1;
+        }
+        ((t_pe32 *)pe)->section_data[section_index] = new_section_data;
+
+        // For ASM
+        loader_offset = ((t_pe32 *)pe)->section_header[section_index].VirtualAddress + old_section_size;
+    }
+    else {
+        new_section_data = realloc(((t_pe64 *)pe)->section_data[section_index], old_section_size + loader_size);
+        if (new_section_data == NULL) {
+            log_error("realloc() failure");
+            return -1;
+        }
+        ((t_pe64 *)pe)->section_data[section_index] = new_section_data;
+
+        // For ASM
+        loader_offset = ((t_pe64 *)pe)->section_header[section_index].VirtualAddress + old_section_size;
+    }
 
     char *loader = patch_loader();
     if(loader == NULL) {
@@ -69,7 +102,7 @@ int pe_cave_insert_loader(t_pe64 *pe, int section_index, int old_section_size) {
     return 1;
 }
 
-int pe_code_cave_injection(t_pe64 *pe) {
+int pe_code_cave_injection(t_pe *pe) {
 
     log_verbose("Finding a code cave ...");
 
@@ -81,7 +114,13 @@ int pe_code_cave_injection(t_pe64 *pe) {
 
     log_verbose("Setting new section values ...");
 
-    int old_section_size = pe->section_header[section_cave_index].Misc.VirtualSize;
+
+    int old_section_size;
+    if(pe->s_type == PE32)
+        old_section_size = ((t_pe32 *)pe)->section_header[section_cave_index].Misc.VirtualSize;
+    else
+        old_section_size = ((t_pe64 *)pe)->section_header[section_cave_index].Misc.VirtualSize;
+
     if(set_new_pe_cave_section_values(pe, section_cave_index) == -1) {
         log_error("Error during section values modification");
         return -1;
@@ -96,7 +135,12 @@ int pe_code_cave_injection(t_pe64 *pe) {
 
     log_verbose("Setting new PE entry point ...");
 
-    uint32_t loader_addr = pe->section_header[section_cave_index].VirtualAddress + old_section_size;
+    uint32_t loader_addr;
+    if(pe->s_type == PE32)
+        loader_addr = ((t_pe32 *)pe)->section_header[section_cave_index].VirtualAddress + old_section_size;
+    else
+        loader_addr = ((t_pe64 *)pe)->section_header[section_cave_index].VirtualAddress + old_section_size;
+
     set_new_pe_entry_to_addr(pe, loader_addr, section_cave_index, old_section_size);
 
     return 1;

@@ -20,36 +20,61 @@ int write_elf(t_elf *elf, char *filename) {
         return -1;
     }
 
-    // We write the ELF header
-    log_verbose("Writing ELF header ...");
-    write_to_file(fd, elf->elf_header, sizeof(Elf64_Ehdr));
-    add_zero_padding(fd, elf->elf_header->e_phoff);
+    if(elf->s_type == ELF32) {
+        log_verbose("Writing ELF header ...");
+        write_to_file(fd, ((t_elf32 *)elf)->elf_header, sizeof(Elf32_Ehdr));
+        add_zero_padding(fd, ((t_elf32 *)elf)->elf_header->e_phoff);
 
-    // We write the program header
-    log_verbose("Writing Program header ...");
-    write_to_file(fd, elf->prog_header, sizeof(Elf64_Phdr) * elf->elf_header->e_phnum);
+        log_verbose("Writing Program header ...");
+        write_to_file(fd, ((t_elf32 *)elf)->prog_header, sizeof(Elf32_Phdr) * ((t_elf32 *)elf)->elf_header->e_phnum);
 
-    // We write the section data
-    log_verbose("Writing Sections data ...");
-    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        if(elf->section_header[i].sh_type != SHT_NOBITS) {
-            add_zero_padding(fd, elf->section_header[i].sh_offset);
+        log_verbose("Writing Sections data ...");
+        for (int i = 0; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
+            if (((t_elf32 *)elf)->section_header[i].sh_type != SHT_NOBITS) {
+                add_zero_padding(fd, ((t_elf32 *)elf)->section_header[i].sh_offset);
 
-            // If we find the section with the code cave
-            if(method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
-                write_to_file(fd, elf->section_data[i], elf->section_header[i].sh_size + loader_size);
-            }
-            else {
-                write_to_file(fd, elf->section_data[i], elf->section_header[i].sh_size);
+                // If we find the section with the code cave
+                if (method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
+                    write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size + loader_size);
+                } else {
+                    write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size);
+                }
             }
         }
-    }
-    add_zero_padding(fd, elf->elf_header->e_shoff);
+        add_zero_padding(fd, ((t_elf32 *)elf)->elf_header->e_shoff);
 
-    // We write the section headers
-    log_verbose("Writing Sections headers ...");
-    for(int i = 0; i < elf->elf_header->e_shnum; i++) {
-        write_to_file(fd, &(elf->section_header[i]), sizeof(Elf64_Shdr));
+        log_verbose("Writing Sections headers ...");
+        for (int i = 0; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
+            write_to_file(fd, &(((t_elf32 *)elf)->section_header[i]), sizeof(Elf32_Shdr));
+        }
+    }
+    else {
+        log_verbose("Writing ELF header ...");
+        write_to_file(fd, ((t_elf64 *)elf)->elf_header, sizeof(Elf64_Ehdr));
+        add_zero_padding(fd, ((t_elf64 *)elf)->elf_header->e_phoff);
+
+        log_verbose("Writing Program header ...");
+        write_to_file(fd, ((t_elf64 *)elf)->prog_header, sizeof(Elf64_Phdr) * ((t_elf64 *)elf)->elf_header->e_phnum);
+
+        log_verbose("Writing Sections data ...");
+        for (int i = 0; i < ((t_elf64 *)elf)->elf_header->e_shnum; i++) {
+            if (((t_elf64 *)elf)->section_header[i].sh_type != SHT_NOBITS) {
+                add_zero_padding(fd, ((t_elf64 *)elf)->section_header[i].sh_offset);
+
+                // If we find the section with the code cave
+                if (method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
+                    write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size + loader_size);
+                } else {
+                    write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size);
+                }
+            }
+        }
+        add_zero_padding(fd, ((t_elf64 *)elf)->elf_header->e_shoff);
+
+        log_verbose("Writing Sections headers ...");
+        for (int i = 0; i < ((t_elf64 *)elf)->elf_header->e_shnum; i++) {
+            write_to_file(fd, &(((t_elf64 *) elf)->section_header[i]), sizeof(Elf64_Shdr));
+        }
     }
 
     close(fd);

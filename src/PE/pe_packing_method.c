@@ -12,7 +12,7 @@
 
 struct method_config method_config;
 
-int pe_pack_using_method(t_pe64 *pe, char *packing_method) {
+int pe_pack_using_method(t_pe *pe, char *packing_method) {
     if(strcmp(packing_method, "section_insertion") == 0) {
         method_config.method_type = SECTION_INSERTION_METHOD;
         if (pe_insert_section(pe) == -1) {
@@ -26,15 +26,6 @@ int pe_pack_using_method(t_pe64 *pe, char *packing_method) {
             log_error("Error during Code Cave Injection");
             return -1;
         }
-     }
-    else if(strcmp(packing_method, "silvio_infection") == 0) {
-        /*
-        method_config.method_type = SILVIO_INFECTION_METHOD;
-        if(silvio_infect(pe) == -1) {
-            log_error("Error during Silvio infection");
-            return -1;
-        }
-        */
     }
 
     return 1;

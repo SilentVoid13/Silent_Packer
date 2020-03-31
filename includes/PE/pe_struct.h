@@ -21,6 +21,11 @@
 
 #define PEMAG 0x00004550
 
+#define DOS_STUB_SIZE 64
+
+#define PE32MAG 0x10b
+#define PE64MAG 0x20b
+
 #define IMAGE_FILE_RELOCS_STRIPPED 0x0001 /**< No relocation info. */
 #define IMAGE_FILE_EXECUTABLE_IMAGE 0x0002
 #define IMAGE_FILE_LINE_NUMS_STRIPPED 0x0004

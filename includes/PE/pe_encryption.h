@@ -12,6 +12,6 @@
 
 #include "pe_allocation.h"
 
-int encrypt_pe(t_pe64 *pe, char *cipher);
+int encrypt_pe(t_pe *pe, char *cipher);
 
 #endif //SILENT_CRYPT_ENCRYPT_PE_H

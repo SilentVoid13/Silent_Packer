@@ -10,45 +10,87 @@
 
 #include "log.h"
 
-int set_new_pe_entry_to_addr(t_pe64 *pe, uint32_t entry_addr, int section_index, int section_size)  {
-    uint32_t last_entry = pe->pe_header->OptionalHeader.AddressOfEntryPoint;
-    pe->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
-    int32_t jump = last_entry - (pe->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+int set_new_pe_entry_to_addr(t_pe *pe, uint32_t entry_addr, int section_index, int section_size)  {
+    if(pe->s_type == PE32) {
+        uint32_t last_entry = ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
+        ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
+        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
 
-    memcpy(pe->section_data[section_index] + section_size + loader_size - (infos_size + 4), &jump, 4);
+        memcpy(((t_pe32 *)pe)->section_data[section_index] + section_size + loader_size - (infos_size + 4), &jump, 4);
+    }
+    else {
+        uint32_t last_entry = ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
+        ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
+        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+
+        memcpy(((t_pe64 *)pe)->section_data[section_index] + section_size + loader_size - (infos_size + 4), &jump, 4);
+    }
 
     return 1;
 }
 
-int set_new_pe_entry_to_section(t_pe64 *pe, int section_index) {
-    uint32_t last_entry = pe->pe_header->OptionalHeader.AddressOfEntryPoint;
-    pe->pe_header->OptionalHeader.AddressOfEntryPoint = pe->section_header[section_index].VirtualAddress;
-    int32_t jump = last_entry - (pe->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+int set_new_pe_entry_to_section(t_pe *pe, int section_index) {
+    if(pe->s_type == PE32) {
+        uint32_t last_entry = ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
+        ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = ((t_pe32 *)pe)->section_header[section_index].VirtualAddress;
+        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
 
-    memcpy(pe->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
+        memcpy(((t_pe32 *)pe)->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
+    }
+    else {
+        uint32_t last_entry = ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
+        ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = ((t_pe64 *)pe)->section_header[section_index].VirtualAddress;
+        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+
+        memcpy(((t_pe64 *)pe)->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
+    }
 
     return 1;
 }
 
-int find_pe_text_section(t_pe64 *pe) {
+int find_pe_text_section(t_pe *pe) {
     int index = -1;
-    for(int i = 0; i < pe->pe_header->FileHeader.NumberOfSections; i++) {
-        if(pe->section_header[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) { // NOLINT(hicpp-signed-bitwise)
-            index = i;
+    if(pe->s_type == PE32) {
+        for (int i = 0; i < ((t_pe32 *)pe)->pe_header->FileHeader.NumberOfSections; i++) {
+            if (((t_pe32 *)pe)->section_header[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) { // NOLINT(hicpp-signed-bitwise)
+                index = i;
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < ((t_pe64 *)pe)->pe_header->FileHeader.NumberOfSections; i++) {
+            if (((t_pe64 *)pe)->section_header[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) { // NOLINT(hicpp-signed-bitwise)
+                index = i;
+            }
         }
     }
     return index;
 }
 
-void add_pe_section_permission(t_pe64 *pe, int segment_index, int permission) {
-    pe->section_header[segment_index].Characteristics |= permission; // NOLINT(hicpp-signed-bitwise)
+void add_pe_section_permission(t_pe *pe, int segment_index, int permission) {
+    if(pe->s_type == PE32) {
+        ((t_pe32 *)pe)->section_header[segment_index].Characteristics |= permission; // NOLINT(hicpp-signed-bitwise)
+    }
+    else {
+        ((t_pe64 *)pe)->section_header[segment_index].Characteristics |= permission; // NOLINT(hicpp-signed-bitwise)
+    }
 }
 
-void print_pe_section_info(t_pe64 *pe, int section_index) {
+void print_pe_section_info(t_pe *pe, int section_index) {
     puts("");
-    printf("Section name : %s\n", pe->section_header[section_index].Name);
-    printf("VirtualSize : %d\n", pe->section_header[section_index].Misc.VirtualSize);
-    printf("SizeofRawData : %d\n", pe->section_header[section_index].SizeOfRawData);
-    printf("PointerToRawData : %x\n", pe->section_header[section_index].PointerToRawData);
-    printf("VirtualAddress : %x\n", pe->section_header[section_index].VirtualAddress);
+
+    if(pe->s_type == PE32) {
+        printf("Section name : %s\n", ((t_pe32 *)pe)->section_header[section_index].Name);
+        printf("VirtualSize : %d\n", ((t_pe32 *)pe)->section_header[section_index].Misc.VirtualSize);
+        printf("SizeofRawData : %d\n", ((t_pe32 *)pe)->section_header[section_index].SizeOfRawData);
+        printf("PointerToRawData : %x\n", ((t_pe32 *)pe)->section_header[section_index].PointerToRawData);
+        printf("VirtualAddress : %x\n", ((t_pe32 *)pe)->section_header[section_index].VirtualAddress);
+    }
+    else {
+        printf("Section name : %s\n", ((t_pe64 *)pe)->section_header[section_index].Name);
+        printf("VirtualSize : %d\n", ((t_pe64 *)pe)->section_header[section_index].Misc.VirtualSize);
+        printf("SizeofRawData : %d\n", ((t_pe64 *)pe)->section_header[section_index].SizeOfRawData);
+        printf("PointerToRawData : %x\n", ((t_pe64 *)pe)->section_header[section_index].PointerToRawData);
+        printf("VirtualAddress : %x\n", ((t_pe64 *)pe)->section_header[section_index].VirtualAddress);
+    }
 }

