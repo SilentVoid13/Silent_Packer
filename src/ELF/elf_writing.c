@@ -35,7 +35,7 @@ int write_elf(t_elf *elf, char *filename) {
 
                 // If we find the section with the code cave
                 if (method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
-                    write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size + loader_size);
+                    write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size + loader_size32);
                 } else {
                     write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size);
                 }
@@ -63,7 +63,7 @@ int write_elf(t_elf *elf, char *filename) {
 
                 // If we find the section with the code cave
                 if (method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
-                    write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size + loader_size);
+                    write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size + loader_size64);
                 } else {
                     write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size);
                 }

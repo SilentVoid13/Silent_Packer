@@ -14,16 +14,16 @@ int set_new_pe_entry_to_addr(t_pe *pe, uint32_t entry_addr, int section_index, i
     if(pe->s_type == PE32) {
         uint32_t last_entry = ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
-        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size32 - infos_size32);
 
-        memcpy(((t_pe32 *)pe)->section_data[section_index] + section_size + loader_size - (infos_size + 4), &jump, 4);
+        memcpy(((t_pe32 *)pe)->section_data[section_index] + section_size + loader_size32 - (infos_size32 + 4), &jump, 4);
     }
     else {
         uint32_t last_entry = ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
-        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size64 - infos_size64);
 
-        memcpy(((t_pe64 *)pe)->section_data[section_index] + section_size + loader_size - (infos_size + 4), &jump, 4);
+        memcpy(((t_pe64 *)pe)->section_data[section_index] + section_size + loader_size64 - (infos_size64 + 4), &jump, 4);
     }
 
     return 1;
@@ -33,16 +33,16 @@ int set_new_pe_entry_to_section(t_pe *pe, int section_index) {
     if(pe->s_type == PE32) {
         uint32_t last_entry = ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = ((t_pe32 *)pe)->section_header[section_index].VirtualAddress;
-        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size32 - infos_size32);
 
-        memcpy(((t_pe32 *)pe)->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
+        memcpy(((t_pe32 *)pe)->section_data[section_index] + loader_size32 - (infos_size32 + 4), &jump, 4);
     }
     else {
         uint32_t last_entry = ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = ((t_pe64 *)pe)->section_header[section_index].VirtualAddress;
-        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size - infos_size);
+        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + loader_size64 - infos_size64);
 
-        memcpy(((t_pe64 *)pe)->section_data[section_index] + loader_size - (infos_size + 4), &jump, 4);
+        memcpy(((t_pe64 *)pe)->section_data[section_index] + loader_size64 - (infos_size64 + 4), &jump, 4);
     }
 
     return 1;

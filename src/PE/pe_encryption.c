@@ -20,34 +20,47 @@ int encrypt_pe(t_pe *pe, char *cipher) {
 
     log_verbose("Got .text section index : %d", text_section_index);
 
-
-    log_verbose("Generating random key ...");
-    cipher_key = generate_random_key();
-    uint64_t temp_key = cipher_key;
-    log_verbose("Random key : %d", cipher_key);
-
     char *text_data;
 
     if(pe->s_type == PE32) {
         // Setting global variables
-        text_entry_point = ((t_pe32 *)pe)->section_header[text_section_index].VirtualAddress;
-        text_data_size = ((t_pe32 *)pe)->section_header[text_section_index].Misc.VirtualSize;
+        text_entry_point32 = ((t_pe32 *)pe)->section_header[text_section_index].VirtualAddress;
+        text_data_size32 = ((t_pe32 *)pe)->section_header[text_section_index].Misc.VirtualSize;
 
         text_data = ((t_pe32 *)pe)->section_data[text_section_index];
+
+        log_verbose("Generating random key ...");
+        cipher_key32 = generate_random_key32();
+        uint64_t temp_key = cipher_key32;
+        log_verbose("Random key : %d", cipher_key32);
+
+        if(strcmp(cipher, "xor") == 0) {
+            xor_encrypt32(text_data, text_data_size32, temp_key);
+        }
+        else if(strcmp(cipher, "aes") == 0) {
+            log_error("AES not implemented yet");
+            return -1;
+        }
     }
     else {
         // Setting global variables
-        text_entry_point = ((t_pe64 *)pe)->section_header[text_section_index].VirtualAddress;
-        text_data_size = ((t_pe64 *)pe)->section_header[text_section_index].Misc.VirtualSize;
+        text_entry_point64 = ((t_pe64 *)pe)->section_header[text_section_index].VirtualAddress;
+        text_data_size64 = ((t_pe64 *)pe)->section_header[text_section_index].Misc.VirtualSize;
 
         text_data = ((t_pe64 *)pe)->section_data[text_section_index];
-    }
 
-    if(strcmp(cipher, "xor") == 0) {
-        xor_encrypt(text_data, text_data_size, temp_key);
-    }
-    else if(strcmp(cipher, "aes") == 0) {
+        log_verbose("Generating random key ...");
+        cipher_key64 = generate_random_key64();
+        uint64_t temp_key = cipher_key64;
+        log_verbose("Random key : %d", cipher_key64);
 
+        if(strcmp(cipher, "xor") == 0) {
+            xor_encrypt64(text_data, text_data_size64, temp_key);
+        }
+        else if(strcmp(cipher, "aes") == 0) {
+            log_error("AES not implemented yet");
+            return -1;
+        }
     }
 
     return 1;

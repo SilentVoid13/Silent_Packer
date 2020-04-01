@@ -17,15 +17,24 @@
 #define LOADER_OFFSET_OFFSET 8
 
 // TODO: Maybe add this to a big struct loader_config
-extern size_t loader_size;
-extern size_t infos_size;
-extern void loader_entry_point(void);
+extern size_t loader_size32;
+extern size_t infos_size32;
+extern void loader_entry_point32(void);
 
-extern uint64_t text_data_size;
-extern uint64_t text_entry_point;
-extern uint64_t cipher_key;
-extern uint64_t loader_offset;
+extern size_t loader_size64;
+extern size_t infos_size64;
+extern void loader_entry_point64(void);
 
-char * patch_loader();
+extern uint32_t text_data_size32;
+extern uint32_t text_entry_point32;
+extern uint32_t cipher_key32;
+extern uint32_t loader_offset32;
+
+extern uint64_t text_data_size64;
+extern uint64_t text_entry_point64;
+extern uint64_t cipher_key64;
+extern uint64_t loader_offset64;
+
+char * patch_loader(int arch);
 
 #endif //SILENT_CRYPT_LOADER_FUNCTIONS_H

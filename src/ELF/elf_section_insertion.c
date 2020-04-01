@@ -7,6 +7,7 @@
 #include "elf_packing_method.h"
 #include "elf_functions.h"
 #include "loader_functions.h"
+#include "file_functions.h"
 
 #include "log.h"
 
@@ -26,11 +27,13 @@ Elf64_Shdr new_section = {
 int set_new_elf_section_string_table(t_elf *elf) {
     char *new_string_table;
 
-    char *section_name = ".decryption";
+    char *section_name = ".dec";
     size_t section_name_length = strlen(section_name);
 
     if(elf->s_type == ELF32) {
         int section_string_table_index = ((t_elf32 *)elf)->elf_header->e_shstrndx;
+
+        int old_size = ((t_elf64 *)elf)->section_header[section_string_table_index].sh_size;
 
         size_t new_string_table_size = ((t_elf32 *)elf)->section_header[section_string_table_index].sh_size + section_name_length + 1;
         new_string_table = realloc(((t_elf32 *)elf)->section_data[section_string_table_index], new_string_table_size);
@@ -38,11 +41,10 @@ int set_new_elf_section_string_table(t_elf *elf) {
             log_error("realloc() failure");
             return -1;
         }
-        memcpy(new_string_table + ((t_elf32 *)elf)->section_header[section_string_table_index].sh_size, section_name,
-               section_name_length + 1);
+        memcpy(new_string_table + old_size, section_name,section_name_length+1);
 
         // We set it to the end of the old section_string_table
-        new_section.sh_name = ((t_elf32 *)elf)->section_header[section_string_table_index].sh_size;
+        new_section.sh_name = old_size;
 
         ((t_elf32 *)elf)->section_data[section_string_table_index] = new_string_table;
         ((t_elf32 *)elf)->section_header[section_string_table_index].sh_size = new_string_table_size;
@@ -50,17 +52,18 @@ int set_new_elf_section_string_table(t_elf *elf) {
     else {
         int section_string_table_index = ((t_elf64 *)elf)->elf_header->e_shstrndx;
 
+        int old_size = ((t_elf64 *)elf)->section_header[section_string_table_index].sh_size;
+
         size_t new_string_table_size = ((t_elf64 *)elf)->section_header[section_string_table_index].sh_size + section_name_length + 1;
         new_string_table = realloc(((t_elf64 *)elf)->section_data[section_string_table_index], new_string_table_size);
         if (new_string_table == NULL) {
             log_error("realloc() failure");
             return -1;
         }
-        memcpy(new_string_table + ((t_elf64 *)elf)->section_header[section_string_table_index].sh_size, section_name,
-               section_name_length + 1);
+        memcpy(new_string_table + old_size, section_name,section_name_length+1);
 
         // We set it to the end of the old section_string_table
-        new_section.sh_name = ((t_elf64 *)elf)->section_header[section_string_table_index].sh_size;
+        new_section.sh_name = old_size;
 
         ((t_elf64 *)elf)->section_data[section_string_table_index] = new_string_table;
         ((t_elf64 *)elf)->section_header[section_string_table_index].sh_size = new_string_table_size;
@@ -158,12 +161,12 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
         new_section.sh_addr =
                 ((t_elf32 *)elf)->prog_header[last_pt_load_index].p_vaddr + ((t_elf32 *)elf)->prog_header[last_pt_load_index].p_memsz;
 
-        new_section.sh_size = loader_size;
+        new_section.sh_size = loader_size32;
 
         // For ASM
-        loader_offset = new_section.sh_addr;
+        loader_offset32 = new_section.sh_addr;
 
-        loader = patch_loader();
+        loader = patch_loader(x32_ARCH);
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
@@ -186,8 +189,14 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
         last_loadable_section_index += 1;
 
         // If the section header string table is after our inserted section, we add + 1 to e_shstrndx to correct its index
-        if (((t_elf32 *)elf)->elf_header->e_shstrndx > last_loadable_section_index) {
+        if (((t_elf32 *)elf)->elf_header->e_shstrndx >= last_loadable_section_index) {
             ((t_elf32 *)elf)->elf_header->e_shstrndx += 1;
+        }
+
+        // We set a new proper section name
+        if (set_new_elf_section_string_table(elf) == -1) {
+            log_error("Error setting new string table");
+            return -1;
         }
 
         // Inserting our new loadable section after the last loadable section
@@ -219,12 +228,12 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
         new_section.sh_addr =
                 ((t_elf64 *)elf)->prog_header[last_pt_load_index].p_vaddr + ((t_elf64 *)elf)->prog_header[last_pt_load_index].p_memsz;
 
-        new_section.sh_size = loader_size;
+        new_section.sh_size = loader_size64;
 
         // For ASM
-        loader_offset = new_section.sh_addr;
+        loader_offset64 = new_section.sh_addr;
 
-        loader = patch_loader();
+        loader = patch_loader(x64_ARCH);
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
@@ -242,20 +251,19 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 
         last_loadable_section_index += 1;
 
-        if (((t_elf64 *)elf)->elf_header->e_shstrndx > last_loadable_section_index) {
+        if (((t_elf64 *)elf)->elf_header->e_shstrndx >= last_loadable_section_index) {
             ((t_elf64 *)elf)->elf_header->e_shstrndx += 1;
+        }
+
+        // We set a new proper section name
+        if (set_new_elf_section_string_table(elf) == -1) {
+            log_error("Error setting new string table");
+            return -1;
         }
 
         memcpy(new_section_headers + last_loadable_section_index, &new_section, sizeof(Elf64_Shdr));
     }
-
     new_section_data[last_loadable_section_index] = loader;
-
-    // We set a new proper string table
-    if (set_new_elf_section_string_table(elf) == -1) {
-        log_error("Error setting new string table");
-        return -1;
-    }
 
     // Fixing sh_link symbol_table index value
     // https://docs.oracle.com/cd/E19683-01/816-1386/6m7qcoblj/index.html#chapter6-47976
@@ -270,12 +278,12 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 int elf_section_set_new_segment_values(t_elf *elf, int segment_index) {
     if(elf->s_type == ELF32) {
         // Set new segment size with our new section included
-        size_t new_segment_size = ((t_elf32 *)elf)->prog_header[segment_index].p_memsz + loader_size;
+        size_t new_segment_size = ((t_elf32 *)elf)->prog_header[segment_index].p_memsz + loader_size32;
         ((t_elf32 *)elf)->prog_header[segment_index].p_memsz = new_segment_size;
         ((t_elf32 *)elf)->prog_header[segment_index].p_filesz = new_segment_size;
     }
     else {
-        size_t new_segment_size = ((t_elf64 *)elf)->prog_header[segment_index].p_memsz + loader_size;
+        size_t new_segment_size = ((t_elf64 *)elf)->prog_header[segment_index].p_memsz + loader_size64;
         ((t_elf64 *)elf)->prog_header[segment_index].p_memsz = new_segment_size;
         ((t_elf64 *)elf)->prog_header[segment_index].p_filesz = new_segment_size;
     }
@@ -390,8 +398,6 @@ int elf_insert_section(t_elf *elf) {
 
     // Add our new section as the new elf entry point
     set_new_elf_entry_to_section(elf, last_loadable_section_index);
-
-
 
     return 1;
 }

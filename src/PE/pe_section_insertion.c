@@ -10,6 +10,7 @@
 #include "pe_allocation.h"
 #include "pe_functions.h"
 #include "loader_functions.h"
+#include "file_functions.h"
 
 #include "log.h"
 
@@ -54,7 +55,7 @@ int add_new_pe_section_header(t_pe *pe) {
         new_header.PointerToRawData =   ((t_pe32 *)pe)->section_header[sections_count - 1].PointerToRawData +
                                         ((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData;
 
-        new_header.Misc.VirtualSize = loader_size;
+        new_header.Misc.VirtualSize = loader_size32;
         new_header.SizeOfRawData = ((t_pe32 *)pe)->pe_header->OptionalHeader.FileAlignment;
 
         new_header.Characteristics = IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_CNT_CODE; // NOLINT(hicpp-signed-bitwise)
@@ -68,7 +69,7 @@ int add_new_pe_section_header(t_pe *pe) {
         new_header.PointerToRawData =   ((t_pe64 *)pe)->section_header[sections_count - 1].PointerToRawData +
                                         ((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData;
 
-        new_header.Misc.VirtualSize = loader_size;
+        new_header.Misc.VirtualSize = loader_size64;
         new_header.SizeOfRawData = ((t_pe64 *)pe)->pe_header->OptionalHeader.FileAlignment;
 
         new_header.Characteristics = IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_CNT_CODE; // NOLINT(hicpp-signed-bitwise)
@@ -88,7 +89,7 @@ int set_new_pe_header_values(t_pe *pe) {
 
         ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfCode += ((t_pe32 *)pe)->section_header[old_sections_count - 1].SizeOfRawData;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfHeaders += sizeof(IMAGE_SECTION_HEADER);
-        ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfImage += loader_size;
+        ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfImage += loader_size32;
     }
     else {
         int old_sections_count = ((t_pe64 *)pe)->pe_header->FileHeader.NumberOfSections;
@@ -96,7 +97,7 @@ int set_new_pe_header_values(t_pe *pe) {
 
         ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfCode += ((t_pe64 *)pe)->section_header[old_sections_count - 1].SizeOfRawData;
         ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfHeaders += sizeof(IMAGE_SECTION_HEADER);
-        ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfImage += loader_size;
+        ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfImage += loader_size64;
     }
 
     return 1;
@@ -114,16 +115,16 @@ int add_new_pe_section_data(t_pe *pe) {
         memset(((t_pe32 *)pe)->section_data[sections_count-1], 0, ((t_pe32 *)pe)->section_header[sections_count-1].SizeOfRawData);
 
         // For ASM
-        loader_offset = ((t_pe32 *)pe)->section_header[sections_count - 1].VirtualAddress;
+        loader_offset32 = ((t_pe32 *)pe)->section_header[sections_count - 1].VirtualAddress;
 
-        char *loader = patch_loader();
+        char *loader = patch_loader(x32_ARCH);
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
         char *new_section = malloc(((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData);
         memset(new_section, 0, ((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData);
-        memcpy(new_section, loader, loader_size);
+        memcpy(new_section, loader, loader_size32);
         ((t_pe32 *)pe)->section_data[sections_count - 1] = new_section;
         free(loader);
     }
@@ -137,16 +138,16 @@ int add_new_pe_section_data(t_pe *pe) {
         ((t_pe64 *)pe)->section_data = new_section_data;
 
         // For ASM
-        loader_offset = ((t_pe64 *)pe)->section_header[sections_count - 1].VirtualAddress;
+        loader_offset64 = ((t_pe64 *)pe)->section_header[sections_count - 1].VirtualAddress;
 
-        char *loader = patch_loader();
+        char *loader = patch_loader(x64_ARCH);
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
         char *new_section = malloc(((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData);
         memset(new_section, 0, ((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData);
-        memcpy(new_section, loader, loader_size);
+        memcpy(new_section, loader, loader_size64);
         ((t_pe64 *)pe)->section_data[sections_count - 1] = new_section;
         free(loader);
     }

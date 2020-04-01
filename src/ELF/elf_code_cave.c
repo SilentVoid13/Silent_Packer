@@ -8,10 +8,9 @@
 #include "elf_allocation.h"
 #include "elf_packing_method.h"
 #include "loader_functions.h"
+#include "file_functions.h"
 
 #include "log.h"
-
-uint64_t loader_offset;
 
 int find_elf_code_cave_index(t_elf *elf) {
     if(elf->s_type == ELF32) {
@@ -30,10 +29,10 @@ int find_elf_code_cave_index(t_elf *elf) {
                                  (((t_elf32 *)elf)->section_header[i].sh_offset + ((t_elf32 *)elf)->section_header[i].sh_size);
             }
 
-            if (code_cave_size > loader_size) {
+            if (code_cave_size > loader_size32) {
                 int segment_index = find_elf_segment_index_of_section(elf, i);
                 if (((t_elf32 *)elf)->prog_header[segment_index].p_type == PT_LOAD) {
-                    //printf("cavity_size : %d\n", code_cave_size);
+                    log_verbose("Code Cave size : %d", code_cave_size);
                     return i;
                 }
             }
@@ -55,10 +54,10 @@ int find_elf_code_cave_index(t_elf *elf) {
                                  (((t_elf64 *)elf)->section_header[i].sh_offset + ((t_elf64 *)elf)->section_header[i].sh_size);
             }
 
-            if (code_cave_size > loader_size) {
+            if (code_cave_size > loader_size64) {
                 int segment_index = find_elf_segment_index_of_section(elf, i);
                 if (((t_elf64 *)elf)->prog_header[segment_index].p_type == PT_LOAD) {
-                    //printf("cavity_size : %d\n", code_cave_size);
+                    log_verbose("Code Cave size : %d", code_cave_size);
                     return i;
                 }
             }
@@ -70,12 +69,12 @@ int find_elf_code_cave_index(t_elf *elf) {
 
 int set_new_elf_cave_segment_values(t_elf *elf, int segment_index) {
     if(elf->s_type == ELF32) {
-        ((t_elf32 *)elf)->prog_header[segment_index].p_memsz += loader_size;
-        ((t_elf32 *)elf)->prog_header[segment_index].p_filesz += loader_size;
+        ((t_elf32 *)elf)->prog_header[segment_index].p_memsz += loader_size32;
+        ((t_elf32 *)elf)->prog_header[segment_index].p_filesz += loader_size32;
     }
     else {
-        ((t_elf64 *)elf)->prog_header[segment_index].p_memsz += loader_size;
-        ((t_elf64 *)elf)->prog_header[segment_index].p_filesz += loader_size;
+        ((t_elf64 *)elf)->prog_header[segment_index].p_memsz += loader_size64;
+        ((t_elf64 *)elf)->prog_header[segment_index].p_filesz += loader_size64;
     }
 
     add_elf_segment_permission(elf, segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
@@ -93,34 +92,42 @@ int set_new_elf_cave_segment_values(t_elf *elf, int segment_index) {
 
 int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) {
     char *new_section_data;
+    char *loader;
 
     if(elf->s_type == ELF32) {
-        new_section_data = realloc(((t_elf32 *)elf)->section_data[section_index], old_section_size + loader_size);
+        new_section_data = realloc(((t_elf32 *)elf)->section_data[section_index], old_section_size + loader_size32);
         if (new_section_data == NULL) {
             log_error("realloc() failure");
             return -1;
         }
         ((t_elf32 *)elf)->section_data[section_index] = new_section_data;
         // For ASM
-        loader_offset = ((t_elf32 *)elf)->section_header[section_index].sh_addr + old_section_size;
+        loader_offset32 = ((t_elf32 *)elf)->section_header[section_index].sh_addr + old_section_size;
+
+        loader = patch_loader(x32_ARCH);
+        if(loader == NULL) {
+            log_error("Error during loader patching");
+            return -1;
+        }
+        memcpy(new_section_data + old_section_size, loader, loader_size32);
     }
     else {
-        new_section_data = realloc(((t_elf64 *)elf)->section_data[section_index], old_section_size + loader_size);
+        new_section_data = realloc(((t_elf64 *)elf)->section_data[section_index], old_section_size + loader_size64);
         if (new_section_data == NULL) {
             log_error("realloc() failure");
             return -1;
         }
         ((t_elf64 *)elf)->section_data[section_index] = new_section_data;
         // For ASM
-        loader_offset = ((t_elf64 *)elf)->section_header[section_index].sh_addr + old_section_size;
-    }
+        loader_offset64 = ((t_elf64 *)elf)->section_header[section_index].sh_addr + old_section_size;
 
-    char *loader = patch_loader();
-    if(loader == NULL) {
-        log_error("Error during loader patching");
-        return -1;
+        loader = patch_loader(x64_ARCH);
+        if(loader == NULL) {
+            log_error("Error during loader patching");
+            return -1;
+        }
+        memcpy(new_section_data + old_section_size, loader, loader_size64);
     }
-    memcpy(new_section_data + old_section_size, loader, loader_size);
 
     return 1;
 }
@@ -164,13 +171,16 @@ int elf_code_cave_injection(t_elf *elf) {
 
     log_verbose("Setting new ELF entry point ...");
 
-    Elf64_Addr loader_addr;
-    if(elf->s_type == ELF32)
-        loader_addr = ((t_elf32 *)elf)->section_header[section_cave_index].sh_addr + old_section_size;
-    else
-        loader_addr = ((t_elf64 *)elf)->section_header[section_cave_index].sh_addr + old_section_size;
-
-    set_new_elf_entry_to_addr(elf, loader_addr, section_cave_index, old_section_size);
+    if(elf->s_type == ELF32) {
+        Elf32_Addr loader_addr;
+        loader_addr = ((t_elf32 *) elf)->section_header[section_cave_index].sh_addr + old_section_size;
+        set_new_elf_entry_to_addr32(elf, loader_addr, section_cave_index, old_section_size);
+    }
+    else {
+        Elf64_Addr loader_addr;
+        loader_addr = ((t_elf64 *) elf)->section_header[section_cave_index].sh_addr + old_section_size;
+        set_new_elf_entry_to_addr64(elf, loader_addr, section_cave_index, old_section_size);
+    }
 
     return 1;
 }
