@@ -11,19 +11,15 @@
 #include <string.h>
 #include <stdint.h>
 
-#define CIPHER_KEY_OFFSET 32
-#define TEXT_ENTRY_POINT_OFFSET 24
-#define TEXT_DATA_SIZE_OFFSET 16
-#define LOADER_OFFSET_OFFSET 8
+#define CIPHER_KEY_OFFSET32         25
+#define TEXT_ENTRY_POINT_OFFSET32   19
+#define TEXT_DATA_SIZE_OFFSET32     13
+#define LOADER_OFFSET_OFFSET32      6
 
-// TODO: Maybe add this to a big struct loader_config
-extern size_t loader_size32;
-extern size_t infos_size32;
-extern void loader_entry_point32(void);
-
-extern size_t loader_size64;
-extern size_t infos_size64;
-extern void loader_entry_point64(void);
+#define CIPHER_KEY_OFFSET64         32
+#define TEXT_ENTRY_POINT_OFFSET64   24
+#define TEXT_DATA_SIZE_OFFSET64     16
+#define LOADER_OFFSET_OFFSET64      8
 
 extern uint32_t text_data_size32;
 extern uint32_t text_entry_point32;
@@ -35,6 +31,6 @@ extern uint64_t text_entry_point64;
 extern uint64_t cipher_key64;
 extern uint64_t loader_offset64;
 
-char * patch_loader(int arch);
+char * patch_loader(int arch, int file_type);
 
 #endif //SILENT_CRYPT_LOADER_FUNCTIONS_H

@@ -14,6 +14,8 @@
 - [x] Add file recognition (ELF or PE)
 - [ ] Add file arch recognition (x32 or x64) 
 - [ ] Free malloc variables
+- [ ] Add submodule warning in makefile
+    - See UPX Makefile
 
 ## ELF
 

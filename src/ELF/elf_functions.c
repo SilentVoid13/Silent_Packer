@@ -6,6 +6,7 @@
 #include "elf_functions.h"
 #include "elf_allocation.h"
 #include "loader_functions.h"
+#include "all_elf_loaders_infos.h"
 
 #include "log.h"
 
@@ -13,16 +14,16 @@ int set_new_elf_entry_to_section(t_elf *elf, int section_index) {
     if(elf->s_type == ELF32) {
         Elf32_Addr last_entry = ((t_elf32 *)elf)->elf_header->e_entry;
         ((t_elf32 *)elf)->elf_header->e_entry = ((t_elf32 *)elf)->section_header[section_index].sh_addr;
-        int32_t jump = last_entry - (((t_elf32 *)elf)->elf_header->e_entry + loader_size32 - infos_size32);
+        int32_t jump = last_entry - (((t_elf32 *)elf)->elf_header->e_entry + I386_LINUX_ELF_LOADER_SIZE - I386_LINUX_ELF_LOADER_INFOS_SIZE);
 
-        memcpy(((t_elf32 *)elf)->section_data[section_index] + loader_size32 - (infos_size32 + 4), &jump, 4);
+        memcpy(((t_elf32 *)elf)->section_data[section_index] + I386_LINUX_ELF_LOADER_SIZE - (I386_LINUX_ELF_LOADER_INFOS_SIZE + 4), &jump, 4);
     }
     else {
         Elf64_Addr last_entry = ((t_elf64 *)elf)->elf_header->e_entry;
         ((t_elf64 *)elf)->elf_header->e_entry = ((t_elf64 *)elf)->section_header[section_index].sh_addr;
-        int32_t jump = last_entry - (((t_elf64 *)elf)->elf_header->e_entry + loader_size64 - infos_size64);
+        int32_t jump = last_entry - (((t_elf64 *)elf)->elf_header->e_entry + AMD64_LINUX_ELF_LOADER_SIZE - AMD64_LINUX_ELF_LOADER_INFOS_SIZE);
 
-        memcpy(((t_elf64 *)elf)->section_data[section_index] + loader_size64 - (infos_size64 + 4), &jump, 4);
+        memcpy(((t_elf64 *)elf)->section_data[section_index] + AMD64_LINUX_ELF_LOADER_SIZE - (AMD64_LINUX_ELF_LOADER_INFOS_SIZE + 4), &jump, 4);
     }
 
     return 1;
@@ -31,9 +32,9 @@ int set_new_elf_entry_to_section(t_elf *elf, int section_index) {
 int set_new_elf_entry_to_addr32(t_elf *elf, int32_t entry_address, int section_index, int section_size) {
     Elf32_Addr last_entry = ((t_elf32 *)elf)->elf_header->e_entry;
     ((t_elf32 *)elf)->elf_header->e_entry = entry_address;
-    int32_t jump = last_entry - (((t_elf32 *)elf)->elf_header->e_entry + loader_size32 - infos_size32);
+    int32_t jump = last_entry - (((t_elf32 *)elf)->elf_header->e_entry + I386_LINUX_ELF_LOADER_SIZE - I386_LINUX_ELF_LOADER_INFOS_SIZE);
 
-    memcpy(((t_elf32 *)elf)->section_data[section_index] + section_size + loader_size32 - (infos_size32 + 4), &jump, 4);
+    memcpy(((t_elf32 *)elf)->section_data[section_index] + section_size + I386_LINUX_ELF_LOADER_SIZE - (I386_LINUX_ELF_LOADER_INFOS_SIZE + 4), &jump, 4);
 
     return 1;
 }
@@ -41,9 +42,9 @@ int set_new_elf_entry_to_addr32(t_elf *elf, int32_t entry_address, int section_i
 int set_new_elf_entry_to_addr64(t_elf *elf, int64_t entry_address, int section_index, int section_size) {
     Elf64_Addr last_entry = ((t_elf64 *)elf)->elf_header->e_entry;
     ((t_elf64 *)elf)->elf_header->e_entry = entry_address;
-    int32_t jump = last_entry - (((t_elf64 *)elf)->elf_header->e_entry + loader_size64 - infos_size64);
+    int32_t jump = last_entry - (((t_elf64 *)elf)->elf_header->e_entry + AMD64_LINUX_ELF_LOADER_SIZE - AMD64_LINUX_ELF_LOADER_INFOS_SIZE);
 
-    memcpy(((t_elf64 *)elf)->section_data[section_index] + section_size + loader_size64 - (infos_size64 + 4), &jump, 4);
+    memcpy(((t_elf64 *)elf)->section_data[section_index] + section_size + AMD64_LINUX_ELF_LOADER_SIZE - (AMD64_LINUX_ELF_LOADER_INFOS_SIZE + 4), &jump, 4);
 
     return 1;
 }

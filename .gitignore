@@ -9,6 +9,7 @@ DEPENDENCIES.md
 *.exe
 *.json
 *.sh
+*.hex
 *.o
 *.drawio
 !compile_all.sh

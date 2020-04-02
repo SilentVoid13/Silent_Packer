@@ -15,4 +15,4 @@ void print_new_section_header_info(IMAGE_SECTION_HEADER *section_header);
 
 int pe_insert_section(t_pe *pe);
 
-#endif //TESTY_PE_SECTION_INSERTION_H
+#endif //SILENT_CRYPT_PE_SECTION_INSERTION_H

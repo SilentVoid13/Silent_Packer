@@ -1,4 +1,3 @@
-
 %macro pushx 1-*
  %rep %0
    push %1
@@ -13,24 +12,14 @@
   %endrep
 %endmacro
 
-[BITS 64]
-
 section .text
 
-global	loader_entry_point64:function
-global	loader_size64:data
-global	infos_size64:data
-
-loader_size64	dq	end - loader_entry_point64
-infos_size64    dq	end - info_start
-
-loader_entry_point64:
-
+loader_entry_point:
 	pushfq
 	pushx	rax, rdi, rsi, rsp, rdx, rcx
 
     ; We save pie offset
-    lea r12, [rel loader_entry_point64]
+    lea r12, [rel loader_entry_point]
     sub r12, [rel info_offset]
 
     ; sys_write
@@ -66,6 +55,7 @@ start_unpacking:
 	popx	rax, rdi, rsi, rsp, rdx, rcx
 	popfq
 	jmp	0xFFFFFFFF
+
 
 ; Random values here, to be patched
 info_start:
