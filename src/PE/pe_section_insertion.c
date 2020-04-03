@@ -113,7 +113,6 @@ int add_new_pe_section_data(t_pe *pe) {
             return -1;
         }
         ((t_pe32 *)pe)->section_data = new_section_data;
-        memset(((t_pe32 *)pe)->section_data[sections_count-1], 0, ((t_pe32 *)pe)->section_header[sections_count-1].SizeOfRawData);
 
         // For ASM
         loader_offset32 = ((t_pe32 *)pe)->section_header[sections_count - 1].VirtualAddress;
@@ -171,12 +170,14 @@ int pe_insert_section(t_pe *pe) {
         return -1;
     }
 
-    log_verbose("Setting new headers values ...");
+    log_verbose("Setting new sections headers values ...");
 
     if(set_new_pe_header_values(pe) == -1) {
         log_error("Couldn't set new PE Header values");
         return -1;
     }
+
+    log_verbose("Inserting the section data ...");
 
     if(add_new_pe_section_data(pe) == -1) {
         log_error("Error during new Section Data insertion");

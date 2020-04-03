@@ -12,15 +12,14 @@
 - [x] Add functions prototypes
 - [ ] Add malloc variable free
 - [x] Add file recognition (ELF or PE)
-- [ ] Add file arch recognition (x32 or x64) 
+- [x] Add file arch recognition (x32 or x64) 
 - [ ] Free malloc variables
-- [ ] Add submodule warning in makefile
-    - See UPX Makefile
+- [x] Add submodule warning in makefile
 
 ## ELF
 
 ### 32 bit
-- [ ] Add 32 bit support
+- [x] Add 32 bit support
 
 ### Section insertion
 - [x] Add section name to the section string table
@@ -46,11 +45,11 @@ s_elf struct :
 
 - [ ] loader (loader_functions)
 
-
 ## PE
 
 ### 32 bit
-- [ ] Add 32 bit support
+- [x] Add 32 bit support
+    - Need to test it
 
 ### Code cave
 - [ ] Clean code
@@ -59,7 +58,6 @@ s_elf struct :
 - [x] Add section insertion packing method
 - [ ] Fix section insertion not working for every binary
     - Don't know why, but it's adding some null bytes at the beginning of the section making the offsets wrong when decrypting the .text
-    
 
 ### Heap allocated variables
 
