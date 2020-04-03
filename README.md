@@ -4,6 +4,8 @@ Silent_Crypt is an ELF / PE packer written in pure C.
 
 This program can be used to obfuscate a binary.
 
+My code is surely not perfect, do not hesitate to make pull requests or to contact me for any problems / code enhancement suggestion at [silentvoid13@protonmail.com](mailto:silentvoid13@protonmail.com).
+
 ## License
 
 Silent_Crypt is licensed under the GNU AGPLv3 license. Refer to [LICENSE](https://github.com/SilentVoid13/Silent_Crypt/blob/master/LICENSE.txt) for more informations.
@@ -21,9 +23,11 @@ You can find a more detailed stackoverflow post [here](https://reverseengineerin
 Silent_Crypt currently support the following file formats :
 
 - ELF64
+- ELF32
 - PE32+
+- PE32
 
-Support for PE32 and ELF32 should arrive soon.
+I will maybe add the MACH-O file format later. You can suggest me a file format that you want me to add.
 
 ## Cipher methods
 
@@ -31,7 +35,7 @@ Silent_Crypt currently support the following cipher methods :
 
 - XOR
 
-Support for AES encryption should arrive soon.
+Support for AES encryption should arrive soon. You can suggest me a cipher method that you want me to add.
 
 ## Encryption methods
 
@@ -60,7 +64,7 @@ Usage: Silent_Crypt [-hVv] [-f file] [-c <xor>] [-m <section_insertion, code_cav
 
 You can either get the compiled version from the latest [release](https://github.com/SilentVoid13/Silent_Crypt/releases), from the [bin](https://github.com/SilentVoid13/Silent_Crypt/tree/master/bin) directory, or compile it yourself.
 
-This project relies on [Silent_Log](https://github.com/SilentVoid13/Silent_Log), so you will need to use `git submodule`.
+This project relies on [Silent_Log](https://github.com/SilentVoid13/Silent_Log).
 
 To build it yourself you will need `cmake` and `gcc`.
 
@@ -69,15 +73,13 @@ No windows version is available at the moment.
 **On Linux**
 
 ```bash
-git submodule init
-git submodule update
 mkdir build && cd build
 cmake ..
 make
 make install
 ```
 
-Compiled binaries will be available in the **bin** directory.
+Compiled binary will be available in the **bin** directory.
 
 ## Known_bugs
 
