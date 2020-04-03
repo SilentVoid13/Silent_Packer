@@ -11,10 +11,10 @@
 #include <string.h>
 #include <stdint.h>
 
-#define CIPHER_KEY_OFFSET32         25
-#define TEXT_ENTRY_POINT_OFFSET32   19
-#define TEXT_DATA_SIZE_OFFSET32     13
-#define LOADER_OFFSET_OFFSET32      6
+#define CIPHER_KEY_OFFSET32         16
+#define TEXT_ENTRY_POINT_OFFSET32   12
+#define TEXT_DATA_SIZE_OFFSET32     8
+#define LOADER_OFFSET_OFFSET32      4
 
 #define CIPHER_KEY_OFFSET64         32
 #define TEXT_ENTRY_POINT_OFFSET64   24

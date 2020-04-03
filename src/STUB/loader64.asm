@@ -16,19 +16,20 @@ section .text
 
 loader_entry_point:
 	pushfq
-	pushx	rax, rdi, rsi, rsp, rdx, rcx
+	pushx rax, rdi, rsi, rsp, rdx, rcx
 
-    ; We save pie offset
-    lea r12, [rel loader_entry_point]
-    sub r12, [rel info_offset]
-
+    ; syscall : rax
+    ; parameter order : rdi, rsi, rdx, r10, r8, r9
     ; sys_write
     mov rax, 1
-    ; register order : rdi, rsi, rdx, rcx, r8, r9
 	mov	rdi, rax
 	lea	rsi, [rel msg]
 	mov	rdx, msg_len
 	syscall
+
+    ; We save pie offset
+    lea r12, [rel loader_entry_point]
+    sub r12, [rel info_offset]
 
 	jmp	start_unpacking
 
@@ -42,7 +43,6 @@ start_unpacking:
 
     ; We add PIE offset
 	add rax, r12
-
 	add	rcx, rax
 
 .loop:
@@ -52,7 +52,7 @@ start_unpacking:
 	cmp	rax, rcx
 	jnz	.loop
 
-	popx	rax, rdi, rsi, rsp, rdx, rcx
+	popx rax, rdi, rsi, rsp, rdx, rcx
 	popfq
 	jmp	0xFFFFFFFF
 
@@ -63,5 +63,3 @@ info_key:	    dq	0xEEEEEEEEEEEEEEEE
 info_addr:	    dq	0xAAAAAAAAAAAAAAAA
 info_size:	    dq  0xBBBBBBBBBBBBBBBB
 info_offset:    dq  0xCCCCCCCCCCCCCCCC
-
-end:

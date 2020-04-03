@@ -52,10 +52,6 @@ char * patch_loader(int arch, int file_type) {
         // Copy the loader asm entry point
         memcpy(loader, loader_stub, loader_size);
 
-        printf("loader_size: %ld\n", loader_size);
-        printf("loader_offset: %x\n", loader_offset32);
-        printf("text_entry_point : %x\n", text_entry_point32);
-
         memcpy(loader + loader_size - CIPHER_KEY_OFFSET32, &cipher_key32, sizeof(uint32_t));
         memcpy(loader + loader_size - TEXT_ENTRY_POINT_OFFSET32, &text_entry_point32, sizeof(uint32_t));
         memcpy(loader + loader_size - TEXT_DATA_SIZE_OFFSET32, &text_data_size32, sizeof(uint32_t));
@@ -86,8 +82,6 @@ char * patch_loader(int arch, int file_type) {
             return NULL;
         }
         memset(loader, 0x0, loader_size);
-
-        printf("loader_size: %ld\n", loader_size);
 
         // Copy the loader asm entry point
         memcpy(loader, loader_stub, loader_size);

@@ -1,108 +1,81 @@
-;[BITS 32]
-;
-;section .text
-;
-;loader_entry_point32:
-;	push eax
-;	push edi
-;	push esi
-;	push esp
-;	push edx
-;	push ecx
-;
-;	; We save pie offset
-;    mov ebx, loader_entry_point32
-;    sub ebx, [info_offset]
-;
-;    ; sys_write
-;	mov edx, msg_len
-;	mov ecx, msg
-;	mov ebx, 1
-;    mov eax, 4
-;    int 0x80
-;
-;	jmp	start_unpacking
-;
-;msg	db	"[Unpacking...]", 10, 0
-;msg_len	equ	$ - msg
-;
-;start_unpacking:
-;	mov	eax, [info_addr]
-;	mov	ecx, [info_size]
-;	mov	edx, [info_key]
-;
-;    ; We add PIE offset
-;	add eax, ebx
-;
-;	add	ecx, eax
-;
-;.loop:
-;	xor	byte [eax], dl
-;	ror	edx, 8
-;	inc	eax
-;	cmp	eax, ecx
-;	jnz	.loop
-;
-;	pop eax
-;	pop edi
-;	pop esi
-;	pop esp
-;	pop edx
-;	pop ecx
-;
-;	jmp	0xFFFFFFF
-;
-;; Random values here, to be patched
-;info_key:	    dq	0xEEEEEEEE
-;info_addr:	    dq	0xAAAAAAAA
-;info_size:	    dq  0xBBBBBBBB
-;info_offset:    dq  0xCCCCCCCC
+%macro pushx 1-*
+ %rep %0
+   push %1
+   %rotate 1
+ %endrep
+%endmacro
+
+%macro popx 1-*
+  %rep %0
+    %rotate -1
+    pop %1
+  %endrep
+%endmacro
 
 section .text
 
-test_function:
+loader_entry_point32:
+	pushx eax, edi, esi, esp, edx, ecx, ebx
+
+    ; syscall : eax
+    ; parameters order : ebx, ecx, edx, esi, edi, ebp
     ; sys_write
+    call get_my_loc
+    sub edx, next_i - msg
+	mov ecx, edx
 	mov edx, msg_len
-	mov ecx, msg
 	mov ebx, 1
     mov eax, 4
     int 0x80
 
+    ; We save pie offset
+    call get_my_loc
+    sub edx, next_i - loader_entry_point32
+    mov ebx, edx
+    call get_my_loc
+    sub edx, next_i - info_offset
+    sub ebx, [edx]
+
+	jmp	start_unpacking
+
 msg	db	"[Unpacking...]", 10, 0
 msg_len	equ	$ - msg
 
-get_eip: mov ebx, [esp]
-         ret
+get_my_loc:
+    call next_i
 
+next_i:
+    pop edx
+    ret
 
 start_unpacking:
-	mov	eax, [info_addr]
-	mov	ecx, [info_size]
-	mov	edx, [info_key]
+    call get_my_loc
+    sub edx, next_i - info_addr
+	mov	eax, [edx]
+	call get_my_loc
+	sub edx, next_i - info_size
+	mov	ecx, [edx]
+	call get_my_loc
+	sub edx, next_i - info_key
+	mov	edx, [edx]
 
     ; We add PIE offset
 	add eax, ebx
-
 	add	ecx, eax
 
 .loop:
 	xor	byte [eax], dl
-	ror	edx, 8
+	ror	edx, 4
 	inc	eax
 	cmp	eax, ecx
 	jnz	.loop
 
-	pop eax
-	pop edi
-	pop esi
-	pop esp
-	pop edx
-	pop ecx
+	popx eax, edi, esi, esp, edx, ecx, ebx
 
 	jmp	0xFFFFFFF
 
 ; Random values here, to be patched
-info_key:	    dq	0xEEEEEEEE
-info_addr:	    dq	0xAAAAAAAA
-info_size:	    dq  0xBBBBBBBB
-info_offset:    dq  0xCCCCCCCC
+info_key:	    dd	0xEEEEEEEE
+info_addr:	    dd	0xAAAAAAAA
+info_size:	    dd  0xBBBBBBBB
+info_offset:    dd  0xCCCCCCCC

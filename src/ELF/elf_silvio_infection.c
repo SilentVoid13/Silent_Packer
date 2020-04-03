@@ -157,7 +157,6 @@ int elf_silvio_infect(t_elf *elf) {
         set_new_elf_entry_to_addr32(elf, loader_addr32, last_section_index, old_section_size);
     }
     else {
-        printf("loader_addr64 : %lx\n", loader_addr64);
         set_new_elf_entry_to_addr64(elf, loader_addr64, last_section_index, old_section_size);
     }
 
