@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_CODE_CAVE_H
-#define SILENT_CRYPT_CODE_CAVE_H
+#ifndef SILENT_PACKER_CODE_CAVE_H
+#define SILENT_PACKER_CODE_CAVE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,4 +18,4 @@ int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size);
 
 int pe_code_cave_injection(t_pe *pe);
 
-#endif //SILENT_CRYPT_CODE_CAVE_H
+#endif //SILENT_PACKER_CODE_CAVE_H

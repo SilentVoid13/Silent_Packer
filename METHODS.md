@@ -1,4 +1,4 @@
-This is a very basic explanation of the different file format structures and how does the different encryption methods used by Silent_Crypt work.
+This is a very basic explanation of the different file format structures and how does the different encryption methods used by Silent_Packer work.
 
 # ELF
 

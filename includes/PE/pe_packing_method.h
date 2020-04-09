@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PACKING_METHOD_PE_H
-#define SILENT_CRYPT_PACKING_METHOD_PE_H
+#ifndef SILENT_PACKER_PACKING_METHOD_PE_H
+#define SILENT_PACKER_PACKING_METHOD_PE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,4 +15,4 @@
 
 int pe_pack_using_method(t_pe *pe, char *packing_method);
 
-#endif //SILENT_CRYPT_PACKING_METHOD_PE_H
+#endif //SILENT_PACKER_PACKING_METHOD_PE_H

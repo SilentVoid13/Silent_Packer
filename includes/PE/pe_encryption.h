@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_ENCRYPT_PE_H
-#define SILENT_CRYPT_ENCRYPT_PE_H
+#ifndef SILENT_PACKER_ENCRYPT_PE_H
+#define SILENT_PACKER_ENCRYPT_PE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,4 +14,4 @@
 
 int encrypt_pe(t_pe *pe, char *cipher);
 
-#endif //SILENT_CRYPT_ENCRYPT_PE_H
+#endif //SILENT_PACKER_ENCRYPT_PE_H

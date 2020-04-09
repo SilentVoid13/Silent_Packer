@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_SECTION_INSERTION_H
-#define SILENT_CRYPT_SECTION_INSERTION_H
+#ifndef SILENT_PACKER_SECTION_INSERTION_H
+#define SILENT_PACKER_SECTION_INSERTION_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,4 +20,4 @@ int set_new_elf_section_pt_loader_permissions(t_elf *elf);
 
 int elf_insert_section(t_elf *elf);
 
-#endif //SILENT_CRYPT_SECTION_INSERTION_H
+#endif //SILENT_PACKER_SECTION_INSERTION_H

@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_ELF_ALLOCATION_H
-#define SILENT_CRYPT_ELF_ALLOCATION_H
+#ifndef SILENT_PACKER_ELF_ALLOCATION_H
+#define SILENT_PACKER_ELF_ALLOCATION_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,4 +46,4 @@ int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_siz
 int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size, int arch);
 
 
-#endif //SILENT_CRYPT_ELF_ALLOCATION_H
+#endif //SILENT_PACKER_ELF_ALLOCATION_H

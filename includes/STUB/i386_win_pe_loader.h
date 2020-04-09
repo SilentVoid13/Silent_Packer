@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_I386_WIN_PE_LOADER_H
-#define SILENT_CRYPT_I386_WIN_PE_LOADER_H
+#ifndef SILENT_PACKER_I386_WIN_PE_LOADER_H
+#define SILENT_PACKER_I386_WIN_PE_LOADER_H
 
 #define I386_WIN_PE_LOADER_INFOS_SIZE 16
 #define I386_WIN_PE_LOADER_SIZE 151
@@ -24,4 +24,4 @@ unsigned char i386_win_pe_loader_stub[] = {
 };
 #endif // NO_PAYLOAD
 
-#endif //SILENT_CRYPT_I386_WIN_PE_LOADER_H
+#endif //SILENT_PACKER_I386_WIN_PE_LOADER_H

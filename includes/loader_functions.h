@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_LOADER_FUNCTIONS_H
-#define SILENT_CRYPT_LOADER_FUNCTIONS_H
+#ifndef SILENT_PACKER_LOADER_FUNCTIONS_H
+#define SILENT_PACKER_LOADER_FUNCTIONS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,4 +33,4 @@ extern uint64_t loader_offset64;
 
 char * patch_loader(int arch, int file_type);
 
-#endif //SILENT_CRYPT_LOADER_FUNCTIONS_H
+#endif //SILENT_PACKER_LOADER_FUNCTIONS_H

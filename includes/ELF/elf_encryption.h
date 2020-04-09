@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_ENCRYPT_ELF_H
-#define SILENT_CRYPT_ENCRYPT_ELF_H
+#ifndef SILENT_PACKER_ENCRYPT_ELF_H
+#define SILENT_PACKER_ENCRYPT_ELF_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,4 +14,4 @@
 
 int encrypt_elf(t_elf *elf, char *cipher);
 
-#endif //SILENT_CRYPT_ENCRYPT_ELF_H
+#endif //SILENT_PACKER_ENCRYPT_ELF_H

@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PE_STRUCT_H
-#define SILENT_CRYPT_PE_STRUCT_H
+#ifndef SILENT_PACKER_PE_STRUCT_H
+#define SILENT_PACKER_PE_STRUCT_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -273,4 +273,4 @@ typedef struct _IMAGE_SECTION_HEADER {
                                 (Readable, Writeable, Executable, etc.) */
 } IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
 
-#endif //SILENT_CRYPT_PE_STRUCT_H
+#endif //SILENT_PACKER_PE_STRUCT_H

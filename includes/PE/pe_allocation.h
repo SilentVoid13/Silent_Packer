@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PE_ALLOCATION_H
-#define SILENT_CRYPT_PE_ALLOCATION_H
+#ifndef SILENT_PACKER_PE_ALLOCATION_H
+#define SILENT_PACKER_PE_ALLOCATION_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,4 +55,4 @@ void print_pe_info(t_pe *pe);
 
 int allocate_pe(t_pe **pe, void *file_data, size_t file_data_size, int arch);
 
-#endif //SILENT_CRYPT_PE_ALLOCATION_H
+#endif //SILENT_PACKER_PE_ALLOCATION_H

@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_SILVIO_INFECTION_H
-#define SILENT_CRYPT_SILVIO_INFECTION_H
+#ifndef SILENT_PACKER_SILVIO_INFECTION_H
+#define SILENT_PACKER_SILVIO_INFECTION_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,4 +21,4 @@ int elf_silvio_insert_loader(t_elf *elf, int section_index, int old_section_size
 
 int elf_silvio_infect(t_elf *elf);
 
-#endif //SILENT_CRYPT_SILVIO_INFECTION_H
+#endif //SILENT_PACKER_SILVIO_INFECTION_H

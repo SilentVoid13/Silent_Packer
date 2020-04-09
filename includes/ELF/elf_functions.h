@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_ELF_FUNCTIONS_H
-#define SILENT_CRYPT_ELF_FUNCTIONS_H
+#ifndef SILENT_PACKER_ELF_FUNCTIONS_H
+#define SILENT_PACKER_ELF_FUNCTIONS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,4 +25,4 @@ int find_elf_section_index(t_elf *elf, char *section_name);
 
 void add_elf_segment_permission(t_elf *elf, int segment_index, int permission);
 
-#endif //SILENT_CRYPT_ELF_FUNCTIONS_H
+#endif //SILENT_PACKER_ELF_FUNCTIONS_H

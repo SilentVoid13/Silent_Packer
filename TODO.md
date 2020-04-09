@@ -15,6 +15,7 @@
 - [x] Add file arch recognition (x32 or x64) 
 - [ ] Free malloc variables
 - [x] Add submodule warning in makefile
+- [ ] Add possibility to add a custom stub (no encryption just executing stub before jumping to main)
 
 ## ELF
 

@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_FILE_FUNCTIONS_H
-#define SILENT_CRYPT_FILE_FUNCTIONS_H
+#ifndef SILENT_PACKER_FILE_FUNCTIONS_H
+#define SILENT_PACKER_FILE_FUNCTIONS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,4 +30,4 @@ int check_magic_bytes(char *file_data, size_t file_data_size);
 int get_elf_arch(const char *file_data, size_t file_data_size);
 int get_pe_arch(const char *file_data, size_t file_data_size);
 
-#endif //SILENT_CRYPT_FILE_FUNCTIONS_H
+#endif //SILENT_PACKER_FILE_FUNCTIONS_H

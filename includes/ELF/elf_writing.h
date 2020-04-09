@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_WRITE_ELF_H
-#define SILENT_CRYPT_WRITE_ELF_H
+#ifndef SILENT_PACKER_WRITE_ELF_H
+#define SILENT_PACKER_WRITE_ELF_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,4 +18,4 @@
 
 int write_elf(t_elf *elf, char *filename);
 
-#endif //SILENT_CRYPT_WRITE_ELF_H
+#endif //SILENT_PACKER_WRITE_ELF_H

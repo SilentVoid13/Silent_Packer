@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PACKING_METHOD_ELF_H
-#define SILENT_CRYPT_PACKING_METHOD_ELF_H
+#ifndef SILENT_PACKER_PACKING_METHOD_ELF_H
+#define SILENT_PACKER_PACKING_METHOD_ELF_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,4 +16,4 @@
 
 int elf_pack_using_method(t_elf *elf, char *packing_method);
 
-#endif //SILENT_CRYPT_PACKING_METHOD_ELF_H
+#endif //SILENT_PACKER_PACKING_METHOD_ELF_H

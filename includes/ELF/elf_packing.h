@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PACK_ELF_H
-#define SILENT_CRYPT_PACK_ELF_H
+#ifndef SILENT_PACKER_PACK_ELF_H
+#define SILENT_PACKER_PACK_ELF_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,4 +17,4 @@
 
 int pack_elf(char *file, char *file_data, size_t file_data_size, int arch, char *cipher, char *packing_method, char *output);
 
-#endif //SILENT_CRYPT_PACK_ELF_H
+#endif //SILENT_PACKER_PACK_ELF_H

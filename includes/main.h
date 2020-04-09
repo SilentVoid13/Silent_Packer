@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_MAIN_H
-#define SILENT_CRYPT_MAIN_H
+#ifndef SILENT_PACKER_MAIN_H
+#define SILENT_PACKER_MAIN_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,4 +12,4 @@
 
 void display_argtable_help(char *progname, void **argtable);
 
-#endif //SILENT_CRYPT_MAIN_H
+#endif //SILENT_PACKER_MAIN_H

@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_CIPHER_FUNCTIONS_H
-#define SILENT_CRYPT_CIPHER_FUNCTIONS_H
+#ifndef SILENT_PACKER_CIPHER_FUNCTIONS_H
+#define SILENT_PACKER_CIPHER_FUNCTIONS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,4 +30,4 @@ uint64_t rotate_right64(uint64_t value);
 int xor_encrypt32(char *data, size_t data_size, uint32_t key);
 int xor_encrypt64(char *data, size_t data_size, uint64_t key);
 
-#endif //SILENT_CRYPT_CIPHER_FUNCTIONS_H
+#endif //SILENT_PACKER_CIPHER_FUNCTIONS_H

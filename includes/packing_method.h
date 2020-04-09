@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PACKING_METHOD_H
-#define SILENT_CRYPT_PACKING_METHOD_H
+#ifndef SILENT_PACKER_PACKING_METHOD_H
+#define SILENT_PACKER_PACKING_METHOD_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,4 +21,4 @@ struct method_config {
 
 extern struct method_config method_config;
 
-#endif //SILENT_CRYPT_PACKING_METHOD_H
+#endif //SILENT_PACKER_PACKING_METHOD_H

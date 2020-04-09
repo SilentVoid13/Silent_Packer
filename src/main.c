@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
                 end      = arg_end(20),
         };
 
-        char *progname = "Silent_Crypt";
+        char *progname = "Silent_Packer";
         char *progversion = "0.1";
         char *progdate = "2020";
         char *author_name = "SilentVoid";

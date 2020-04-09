@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PE_FUNCTIONS_H
-#define SILENT_CRYPT_PE_FUNCTIONS_H
+#ifndef SILENT_PACKER_PE_FUNCTIONS_H
+#define SILENT_PACKER_PE_FUNCTIONS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,4 +19,4 @@ int find_pe_text_section(t_pe *pe);
 void add_pe_section_permission(t_pe *pe, int segment_index, int permission);
 void print_pe_section_info(t_pe *pe, int section_index);
 
-#endif //SILENT_CRYPT_PE_FUNCTIONS_H
+#endif //SILENT_PACKER_PE_FUNCTIONS_H

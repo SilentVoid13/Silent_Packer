@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_C_FLAGS "-Wall")
 set(CMAKE_C_FLAGS "-Wextra")
 
-project(Silent_Crypt)
+project(Silent_Packer)
 
 # https://cliutils.gitlab.io/modern-cmake/chapters/projects/submodule.html
 ### Git Submodule management ###
@@ -51,8 +51,8 @@ set(COMMON_SOURCES ${ELF_SOURCES} ${PE_SOURCES} src/common/file_functions.c src/
 
 set(SOURCES ${SOURCES} ${COMMON_SOURCES} ${ASSEMBLY_SOURCES})
 
-add_executable(Silent_Crypt ${SOURCES})
-install(TARGETS Silent_Crypt DESTINATION bin)
+add_executable(Silent_Packer ${SOURCES})
+install(TARGETS Silent_Packer DESTINATION bin)
 
 ### Libs ###
 
@@ -60,4 +60,4 @@ install(TARGETS Silent_Crypt DESTINATION bin)
 set(ARGTABLE_SOURCES lib/src/argtable3.c)
 add_library(argtable3 STATIC ${ARGTABLE_SOURCES})
 
-target_link_libraries(Silent_Crypt argtable3 pthread m)
+target_link_libraries(Silent_Packer argtable3 pthread m)

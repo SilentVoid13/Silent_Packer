@@ -3,8 +3,8 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_CRYPT_PE_SECTION_INSERTION_H
-#define SILENT_CRYPT_PE_SECTION_INSERTION_H
+#ifndef SILENT_PACKER_PE_SECTION_INSERTION_H
+#define SILENT_PACKER_PE_SECTION_INSERTION_H
 
 #include "pe_allocation.h"
 
@@ -15,4 +15,4 @@ void print_new_section_header_info(IMAGE_SECTION_HEADER *section_header);
 
 int pe_insert_section(t_pe *pe);
 
-#endif //SILENT_CRYPT_PE_SECTION_INSERTION_H
+#endif //SILENT_PACKER_PE_SECTION_INSERTION_H
