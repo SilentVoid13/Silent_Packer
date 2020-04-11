@@ -7,6 +7,7 @@
 #include "pe_struct.h"
 #include "pe_allocation.h"
 #include "loader_functions.h"
+#include "packer_config.h"
 #include "all_pe_loaders_infos.h"
 
 #include "log.h"
@@ -15,16 +16,16 @@ int set_new_pe_entry_to_addr(t_pe *pe, uint32_t entry_addr, int section_index, i
     if(pe->s_type == PE32) {
         uint32_t last_entry = ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
-        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + I386_WIN_PE_LOADER_SIZE - I386_WIN_PE_LOADER_INFOS_SIZE);
+        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + packer_config.loader_size - packer_config.loader_infos_size);
 
-        memcpy(((t_pe32 *)pe)->section_data[section_index] + section_size + I386_WIN_PE_LOADER_SIZE - (I386_WIN_PE_LOADER_INFOS_SIZE + 4), &jump, 4);
+        memcpy(((t_pe32 *)pe)->section_data[section_index] + section_size + packer_config.loader_size - (packer_config.loader_infos_size + 4), &jump, 4);
     }
     else {
         uint32_t last_entry = ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = entry_addr;
-        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + AMD64_WIN_PE_LOADER_SIZE - AMD64_WIN_PE_LOADER_INFOS_SIZE);
+        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + packer_config.loader_size - packer_config.loader_infos_size);
 
-        memcpy(((t_pe64 *)pe)->section_data[section_index] + section_size + AMD64_WIN_PE_LOADER_SIZE - (AMD64_WIN_PE_LOADER_INFOS_SIZE + 4), &jump, 4);
+        memcpy(((t_pe64 *)pe)->section_data[section_index] + section_size + packer_config.loader_size - (packer_config.loader_infos_size + 4), &jump, 4);
     }
 
     return 1;
@@ -34,16 +35,16 @@ int set_new_pe_entry_to_section(t_pe *pe, int section_index) {
     if(pe->s_type == PE32) {
         uint32_t last_entry = ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = ((t_pe32 *)pe)->section_header[section_index].VirtualAddress;
-        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + I386_WIN_PE_LOADER_SIZE - I386_WIN_PE_LOADER_INFOS_SIZE);
+        int32_t jump = last_entry - (((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + packer_config.loader_size - packer_config.loader_infos_size);
 
-        memcpy(((t_pe32 *)pe)->section_data[section_index] + I386_WIN_PE_LOADER_SIZE - (I386_WIN_PE_LOADER_INFOS_SIZE + 4), &jump, 4);
+        memcpy(((t_pe32 *)pe)->section_data[section_index] + packer_config.loader_size - (packer_config.loader_infos_size + 4), &jump, 4);
     }
     else {
         uint32_t last_entry = ((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint = ((t_pe64 *)pe)->section_header[section_index].VirtualAddress;
-        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + AMD64_WIN_PE_LOADER_SIZE - AMD64_WIN_PE_LOADER_INFOS_SIZE);
+        int32_t jump = last_entry - (((t_pe64 *)pe)->pe_header->OptionalHeader.AddressOfEntryPoint + packer_config.loader_size - packer_config.loader_infos_size);
 
-        memcpy(((t_pe64 *)pe)->section_data[section_index] + AMD64_WIN_PE_LOADER_SIZE - (AMD64_WIN_PE_LOADER_INFOS_SIZE + 4), &jump, 4);
+        memcpy(((t_pe64 *)pe)->section_data[section_index] + packer_config.loader_size - (packer_config.loader_infos_size + 4), &jump, 4);
     }
 
     return 1;

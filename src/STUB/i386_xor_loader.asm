@@ -75,7 +75,7 @@ start_unpacking:
 	jmp	0xFFFFFFF
 
 ; Random values here, to be patched
-info_key:	    dd	0xEEEEEEEE
-info_addr:	    dd	0xAAAAAAAA
-info_size:	    dd  0xBBBBBBBB
-info_offset:    dd  0xCCCCCCCC
+info_key:	    dd	0xaaaaaaaa
+info_addr:	    dd	0xbbbbbbbb
+info_size:	    dd  0xcccccccc
+info_offset:    dd  0xdddddddd

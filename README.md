@@ -34,8 +34,13 @@ I will maybe add the MACH-O file format later. You can suggest me a file format 
 Silent_Packer currently support the following cipher methods :
 
 - XOR
+- AES-128-ECB
 
-Support for AES encryption should arrive soon. You can suggest me a cipher method that you want me to add.
+AES is currently only available for ELF64. Support for other file formats should arrive soon.
+
+Support for some more secure AES modes should arrive soon (AES-128-CBC, AES-256)
+
+You can suggest me a cipher method that you want me to add.
 
 ## Encryption methods
 
@@ -50,12 +55,13 @@ For a basic explanation on how does these methods work, see the [METHODS](https:
 ## Usage
 
 ```bash
-Usage: Silent_Packer [-hVv] [-f file] [-c <xor>] [-m <section_insertion, code_cave, silvio_infection>] [-o file]
+Usage: Silent_Packer [-hVvd] [-f file] [-c <xor, aes128_ecb>] [-m <section_insertion, code_cave, silvio_infection>] [-o file]
   -h, --help                Display this help and exit
   -V, --version             Display version info and exit
   -v, --verbose             Verbose output
+  -d, --debug               Debug mode
   -f, --file=file           File to pack
-  -c, --cipher=<xor>        Cipher method to use
+  -c, --cipher=<xor, aes128_ecb> Cipher method to use
   -m, --method=<section_insertion, code_cave, silvio_infection> Method to pack the binary
   -o, --output=file         Output file
 ```
@@ -64,7 +70,7 @@ Usage: Silent_Packer [-hVv] [-f file] [-c <xor>] [-m <section_insertion, code_ca
 
 You can either get the compiled version from the latest [release](https://github.com/SilentVoid13/Silent_Packer/releases), from the [bin](https://github.com/SilentVoid13/Silent_Packer/tree/master/bin) directory, or compile it yourself.
 
-This project relies on [Silent_Log](https://github.com/SilentVoid13/Silent_Log).
+This project relies on [Silent_Log](https://github.com/SilentVoid13/Silent_Log) for logging messages.
 
 To build it yourself you will need `cmake` and `gcc`.
 

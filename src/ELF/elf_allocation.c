@@ -5,6 +5,7 @@
 
 #include "elf_allocation.h"
 #include "file_functions.h"
+#include "packer_config.h"
 
 #include "log.h"
 
@@ -208,10 +209,10 @@ int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_siz
     return 1;
 }
 
-int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size, int arch) {
+int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
     size_t t_elf_size;
 
-    if(arch == x32_ARCH)
+    if(packer_config.arch == x32_ARCH)
         t_elf_size = sizeof(t_elf32);
     else
         t_elf_size = sizeof(t_elf64);
@@ -225,7 +226,7 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size, int arch) 
 
 
     t_elf type_pe;
-    if(arch == 32) {
+    if(packer_config.arch == 32) {
         type_pe.s_type = ELF32;
         ((t_elf32 *)(*elf))->type_header = type_pe;
     }

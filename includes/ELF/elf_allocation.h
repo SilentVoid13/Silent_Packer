@@ -43,7 +43,7 @@ int allocate_elf_program_header(t_elf *elf, void *file_data, size_t file_data_si
 int allocate_elf_sections_header(t_elf *elf, void *file_data, size_t file_data_size);
 int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_size);
 
-int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size, int arch);
+int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size);
 
 
 #endif //SILENT_PACKER_ELF_ALLOCATION_H

@@ -7,6 +7,7 @@
 #include "elf_packing_method.h"
 #include "elf_functions.h"
 #include "loader_functions.h"
+#include "packer_config.h"
 #include "file_functions.h"
 #include "all_elf_loaders_infos.h"
 
@@ -176,12 +177,12 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
         new_section32.sh_addr =
                 ((t_elf32 *)elf)->prog_header[last_pt_load_index].p_vaddr + ((t_elf32 *)elf)->prog_header[last_pt_load_index].p_memsz;
 
-        new_section32.sh_size = I386_LINUX_ELF_LOADER_SIZE;
+        new_section32.sh_size = packer_config.loader_size;
 
         // For ASM
         loader_offset32 = new_section32.sh_addr;
 
-        loader = patch_loader(x32_ARCH, ELF32);
+        loader = patch_loader(x32_ARCH, ELF32, packer_config.cipher);
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
@@ -243,12 +244,12 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
         new_section64.sh_addr =
                 ((t_elf64 *)elf)->prog_header[last_pt_load_index].p_vaddr + ((t_elf64 *)elf)->prog_header[last_pt_load_index].p_memsz;
 
-        new_section64.sh_size = AMD64_LINUX_ELF_LOADER_SIZE;
+        new_section64.sh_size = packer_config.loader_size;
 
         // For ASM
         loader_offset64 = new_section64.sh_addr;
 
-        loader = patch_loader(x64_ARCH, ELF64);
+        loader = patch_loader();
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
@@ -294,12 +295,12 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 int elf_section_set_new_segment_values(t_elf *elf, int segment_index) {
     if(elf->s_type == ELF32) {
         // Set new segment size with our new section included
-        size_t new_segment_size = ((t_elf32 *)elf)->prog_header[segment_index].p_memsz + I386_LINUX_ELF_LOADER_SIZE;
+        size_t new_segment_size = ((t_elf32 *)elf)->prog_header[segment_index].p_memsz + packer_config.loader_size;
         ((t_elf32 *)elf)->prog_header[segment_index].p_memsz = new_segment_size;
         ((t_elf32 *)elf)->prog_header[segment_index].p_filesz = new_segment_size;
     }
     else {
-        size_t new_segment_size = ((t_elf64 *)elf)->prog_header[segment_index].p_memsz + AMD64_LINUX_ELF_LOADER_SIZE;
+        size_t new_segment_size = ((t_elf64 *)elf)->prog_header[segment_index].p_memsz + packer_config.loader_size;
         ((t_elf64 *)elf)->prog_header[segment_index].p_memsz = new_segment_size;
         ((t_elf64 *)elf)->prog_header[segment_index].p_filesz = new_segment_size;
     }

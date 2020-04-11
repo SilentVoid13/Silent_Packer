@@ -9,6 +9,7 @@
 #include "elf_packing_method.h"
 #include "loader_functions.h"
 #include "file_functions.h"
+#include "packer_config.h"
 #include "all_elf_loaders_infos.h"
 
 #include "log.h"
@@ -30,7 +31,7 @@ int find_elf_code_cave_index(t_elf *elf) {
                                  (((t_elf32 *)elf)->section_header[i].sh_offset + ((t_elf32 *)elf)->section_header[i].sh_size);
             }
 
-            if (code_cave_size > I386_LINUX_ELF_LOADER_SIZE) {
+            if (code_cave_size > packer_config.loader_size) {
                 int segment_index = find_elf_segment_index_of_section(elf, i);
                 if (((t_elf32 *)elf)->prog_header[segment_index].p_type == PT_LOAD) {
                     log_verbose("Code Cave size : %d", code_cave_size);
@@ -55,7 +56,7 @@ int find_elf_code_cave_index(t_elf *elf) {
                                  (((t_elf64 *)elf)->section_header[i].sh_offset + ((t_elf64 *)elf)->section_header[i].sh_size);
             }
 
-            if (code_cave_size > AMD64_LINUX_ELF_LOADER_SIZE) {
+            if (code_cave_size > packer_config.loader_size) {
                 int segment_index = find_elf_segment_index_of_section(elf, i);
                 if (((t_elf64 *)elf)->prog_header[segment_index].p_type == PT_LOAD) {
                     log_verbose("Code Cave size : %d", code_cave_size);
@@ -70,12 +71,12 @@ int find_elf_code_cave_index(t_elf *elf) {
 
 int set_new_elf_cave_segment_values(t_elf *elf, int segment_index) {
     if(elf->s_type == ELF32) {
-        ((t_elf32 *)elf)->prog_header[segment_index].p_memsz += I386_LINUX_ELF_LOADER_SIZE;
-        ((t_elf32 *)elf)->prog_header[segment_index].p_filesz += I386_LINUX_ELF_LOADER_SIZE;
+        ((t_elf32 *)elf)->prog_header[segment_index].p_memsz += packer_config.loader_size;
+        ((t_elf32 *)elf)->prog_header[segment_index].p_filesz += packer_config.loader_size;
     }
     else {
-        ((t_elf64 *)elf)->prog_header[segment_index].p_memsz += AMD64_LINUX_ELF_LOADER_SIZE;
-        ((t_elf64 *)elf)->prog_header[segment_index].p_filesz += AMD64_LINUX_ELF_LOADER_SIZE;
+        ((t_elf64 *)elf)->prog_header[segment_index].p_memsz += packer_config.loader_size;
+        ((t_elf64 *)elf)->prog_header[segment_index].p_filesz += packer_config.loader_size;
     }
 
     add_elf_segment_permission(elf, segment_index, PF_W); // NOLINT(hicpp-signed-bitwise)
@@ -96,7 +97,7 @@ int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) 
     char *loader;
 
     if(elf->s_type == ELF32) {
-        new_section_data = realloc(((t_elf32 *)elf)->section_data[section_index], old_section_size + I386_LINUX_ELF_LOADER_SIZE);
+        new_section_data = realloc(((t_elf32 *)elf)->section_data[section_index], old_section_size + packer_config.loader_size);
         if (new_section_data == NULL) {
             log_error("realloc() failure");
             return -1;
@@ -105,15 +106,15 @@ int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) 
         // For ASM
         loader_offset32 = ((t_elf32 *)elf)->section_header[section_index].sh_addr + old_section_size;
 
-        loader = patch_loader(x32_ARCH, ELF32);
+        loader = patch_loader();
         if(loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
-        memcpy(new_section_data + old_section_size, loader, I386_LINUX_ELF_LOADER_SIZE);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
     else {
-        new_section_data = realloc(((t_elf64 *)elf)->section_data[section_index], old_section_size + AMD64_LINUX_ELF_LOADER_SIZE);
+        new_section_data = realloc(((t_elf64 *)elf)->section_data[section_index], old_section_size + packer_config.loader_size);
         if (new_section_data == NULL) {
             log_error("realloc() failure");
             return -1;
@@ -122,12 +123,12 @@ int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) 
         // For ASM
         loader_offset64 = ((t_elf64 *)elf)->section_header[section_index].sh_addr + old_section_size;
 
-        loader = patch_loader(x64_ARCH, ELF64);
+        loader = patch_loader();
         if(loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
-        memcpy(new_section_data + old_section_size, loader, AMD64_LINUX_ELF_LOADER_SIZE);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
 
     return 1;

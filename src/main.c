@@ -5,11 +5,12 @@
 #include "elf_packing.h"
 #include "pe_packing.h"
 #include "file_functions.h"
+#include "packer_config.h"
 
 #include "argtable3.h"
 #include "log.h"
 
-struct arg_lit *verb, *help, *version;
+struct arg_lit *verb, *help, *version, *debug;
 struct arg_str *cipher, *packing_method;
 struct arg_file *output, *file;
 struct arg_end *end;
@@ -26,8 +27,9 @@ int main(int argc, char** argv) {
                 help     = arg_litn("h", "help", 0, 1, "Display this help and exit"),
                 version  = arg_litn("V", "version", 0, 1, "Display version info and exit"),
                 verb     = arg_litn("v", "verbose", 0, 1, "Verbose output"),
+                debug    = arg_litn("d", "debug", 0, 1, "Debug mode"),
                 file     = arg_filen("f", "file", "file", 0, 1, "File to pack"),
-                cipher   = arg_strn("c", "cipher", "<xor>", 0, 1, "Cipher method to use"),
+                cipher   = arg_strn("c", "cipher", "<xor, aes128_ecb>", 0, 1, "Cipher method to use"),
                 packing_method = arg_strn("m", "method", "<section_insertion, code_cave, silvio_infection>", 0, 1, "Method to pack the binary"),
                 output   = arg_filen("o", "output", "file", 0, 1, "Output file"),
                 end      = arg_end(20),
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
         if(file->count > 0 && cipher->count > 0 && packing_method->count > 0) {
             if(
                     (strcmp(cipher->sval[0], "xor") != 0) &&
-                    (strcmp(cipher->sval[0], "aes") != 0)
+                    (strcmp(cipher->sval[0], "aes128_ecb") != 0)
             ) {
                 log_error("Wrong cipher method");
                 display_argtable_help(progname, argtable);
@@ -99,7 +101,12 @@ int main(int argc, char** argv) {
                     return -1;
                 }
 
-                int p_status = pack_elf((char *) file->filename[0], file_data, file_data_size, arch, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+                if(fill_packer_config((char *) packing_method->sval[0], (char *) cipher->sval[0], arch, file_type, debug->count) == -1) {
+                    log_error("Error during packer configuration");
+                    return -1;
+                }
+
+                int p_status = pack_elf((char *) file->filename[0], file_data, file_data_size, (char *) output->filename[0]);
                 if(p_status == -1) {
                     log_error("An error occured during the ELF packing");
                 }
@@ -111,7 +118,17 @@ int main(int argc, char** argv) {
                     return -1;
                 }
 
-                int p_status = pack_pe((char *) file->filename[0], file_data, file_data_size, arch, (char *) cipher->sval[0], (char *) packing_method->sval[0], (char *) output->filename[0]);
+                if(strcmp(packing_method->sval[0], "silvio_infection") == 0) {
+                    log_error("Silvio infection is not available for PE files");
+                    return -1;
+                }
+
+                if(fill_packer_config((char *) packing_method->sval[0], (char *) cipher->sval[0], arch, file_type, debug->count) == -1) {
+                    log_error("Error during packer configuration");
+                    return -1;
+                }
+
+                int p_status = pack_pe((char *) file->filename[0], file_data, file_data_size, (char *) output->filename[0]);
                 if(p_status == -1) {
                     log_error("An error occured during the PE packing");
                 }

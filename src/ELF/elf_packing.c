@@ -9,6 +9,7 @@
 #include "elf_encryption.h"
 #include "elf_writing.h"
 #include "elf_packing_method.h"
+#include "packer_config.h"
 
 #include "log.h"
 
@@ -32,12 +33,12 @@
  *
 */
 
-int pack_elf(char *file, char *file_data, size_t file_data_size, int arch, char *cipher, char *packing_method, char *output) {
-    log_verbose("Detected arch : x%d", arch);
+int pack_elf(char *file, char *file_data, size_t file_data_size, char *output) {
+    log_verbose("Detected arch : x%d", packer_config.arch);
     log_info("Allocating ELF in memory ...");
 
     t_elf *elf = NULL;
-    if(allocate_elf(&elf, file_data, file_data_size, arch) == -1) {
+    if(allocate_elf(&elf, file_data, file_data_size) == -1) {
         log_error("Error during ELF allocation");
         return -1;
     }
@@ -46,13 +47,13 @@ int pack_elf(char *file, char *file_data, size_t file_data_size, int arch, char 
     munmap(file_data, file_data_size);
 
     log_info("Encrypting .text section ...");
-    if(encrypt_elf(elf, cipher) == -1) {
+    if(encrypt_elf(elf) == -1) {
         log_error("Error during ELF encryption");
         return -1;
     }
 
     log_info("Packing using specified method ...");
-    if(elf_pack_using_method(elf, packing_method) == -1) {
+    if(elf_pack_using_method(elf) == -1) {
         log_error("Error during ELF packing");
         return -1;
     }

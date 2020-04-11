@@ -13,6 +13,6 @@
 #include "pe_allocation.h"
 #include "packing_method.h"
 
-int pe_pack_using_method(t_pe *pe, char *packing_method);
+int pe_pack_using_method(t_pe *pe);
 
 #endif //SILENT_PACKER_PACKING_METHOD_PE_H

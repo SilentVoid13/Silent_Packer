@@ -3,14 +3,14 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_PACKER_I386_LINUX_LOADER_H
-#define SILENT_PACKER_I386_LINUX_LOADER_H
+#ifndef SILENT_PACKER_I386_XOR_WIN_PE_LOADER_H
+#define SILENT_PACKER_I386_XOR_WIN_PE_LOADER_H
 
-#define I386_LINUX_ELF_LOADER_INFOS_SIZE 16
-#define I386_LINUX_ELF_LOADER_SIZE 151
+#define I386_XOR_WIN_PE_LOADER_INFOS_SIZE 16
+#define I386_XOR_WIN_PE_LOADER_SIZE 151
 
 #ifndef NO_PAYLOAD
-unsigned char i386_linux_elf_loader_stub[] = {
+unsigned char i386_xor_win_pe_loader_stub[] = {
         0x50, 0x57, 0x56, 0x54, 0x52, 0x51, 0x53, 0xe8, 0x3c, 0x00, 0x00, 0x00, 0x83, 0xea, 0x15, 0x89,
         0xd1, 0xba, 0x10, 0x00, 0x00, 0x00, 0xbb, 0x01, 0x00, 0x00, 0x00, 0xb8, 0x04, 0x00, 0x00, 0x00,
         0xcd, 0x80, 0xe8, 0x21, 0x00, 0x00, 0x00, 0x83, 0xea, 0x4d, 0x89, 0xd3, 0xe8, 0x17, 0x00, 0x00,
@@ -24,4 +24,4 @@ unsigned char i386_linux_elf_loader_stub[] = {
 };
 #endif // NO_PAYLOAD
 
-#endif
+#endif //SILENT_PACKER_I386_XOR_WIN_PE_LOADER_H

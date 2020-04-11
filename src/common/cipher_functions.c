@@ -23,6 +23,33 @@ uint64_t generate_random_key64() {
     return key;
 }
 
+unsigned char * generate_random_key128() {
+    unsigned char *key = malloc(16);
+    if(key == NULL) {
+        log_error("malloc() failure");
+        return NULL;
+    }
+
+    srand(time(NULL)); // NOLINT(cert-msc32-c,cert-msc51-cpp)
+    uint32_t first = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
+    uint32_t second = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
+    uint32_t third = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
+    uint32_t fourth = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
+
+    memcpy(key, &first, sizeof(uint32_t));
+    memcpy(key+4, &second, sizeof(uint32_t));
+    memcpy(key+8, &third, sizeof(uint32_t));
+    memcpy(key+12, &fourth, sizeof(uint32_t));
+
+    //uint32_t test = 0x41414141;
+    //memcpy(key, &test, sizeof(uint32_t));
+    //memcpy(key+4, &test, sizeof(uint32_t));
+    //memcpy(key+8, &test, sizeof(uint32_t));
+    //memcpy(key+12, &test, sizeof(uint32_t));
+
+    return key;
+}
+
 uint32_t rotate_right32(uint32_t value) {
     // https://www.geeksforgeeks.org/rotate-bits-of-an-integer/
     // https://blog.regehr.org/archives/1063
@@ -38,6 +65,7 @@ uint64_t rotate_right64(uint64_t value) {
     uint64_t int_bits = sizeof(uint64_t) * 8;
     return (value >> n_rotations) | (value << (int_bits - n_rotations));
 }
+
 
 int xor_encrypt32(char *data, size_t data_size, uint32_t key) {
     for(int i = 0; i < (int)data_size; i++) {

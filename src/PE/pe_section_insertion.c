@@ -11,6 +11,7 @@
 #include "pe_functions.h"
 #include "loader_functions.h"
 #include "file_functions.h"
+#include "packer_config.h"
 #include "all_pe_loaders_infos.h"
 
 #include "log.h"
@@ -56,7 +57,7 @@ int add_new_pe_section_header(t_pe *pe) {
         new_header.PointerToRawData =   ((t_pe32 *)pe)->section_header[sections_count - 1].PointerToRawData +
                                         ((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData;
 
-        new_header.Misc.VirtualSize = I386_WIN_PE_LOADER_SIZE;
+        new_header.Misc.VirtualSize = packer_config.loader_size;
         new_header.SizeOfRawData = ((t_pe32 *)pe)->pe_header->OptionalHeader.FileAlignment;
 
         new_header.Characteristics = IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_CNT_CODE; // NOLINT(hicpp-signed-bitwise)
@@ -70,7 +71,7 @@ int add_new_pe_section_header(t_pe *pe) {
         new_header.PointerToRawData =   ((t_pe64 *)pe)->section_header[sections_count - 1].PointerToRawData +
                                         ((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData;
 
-        new_header.Misc.VirtualSize = AMD64_WIN_PE_LOADER_SIZE;
+        new_header.Misc.VirtualSize = packer_config.loader_size;
         new_header.SizeOfRawData = ((t_pe64 *)pe)->pe_header->OptionalHeader.FileAlignment;
 
         new_header.Characteristics = IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_CNT_CODE; // NOLINT(hicpp-signed-bitwise)
@@ -90,7 +91,7 @@ int set_new_pe_header_values(t_pe *pe) {
 
         ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfCode += ((t_pe32 *)pe)->section_header[old_sections_count - 1].SizeOfRawData;
         ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfHeaders += sizeof(IMAGE_SECTION_HEADER);
-        ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfImage += I386_WIN_PE_LOADER_SIZE;
+        ((t_pe32 *)pe)->pe_header->OptionalHeader.SizeOfImage += packer_config.loader_size;
     }
     else {
         int old_sections_count = ((t_pe64 *)pe)->pe_header->FileHeader.NumberOfSections;
@@ -98,7 +99,7 @@ int set_new_pe_header_values(t_pe *pe) {
 
         ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfCode += ((t_pe64 *)pe)->section_header[old_sections_count - 1].SizeOfRawData;
         ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfHeaders += sizeof(IMAGE_SECTION_HEADER);
-        ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfImage += AMD64_WIN_PE_LOADER_SIZE;
+        ((t_pe64 *)pe)->pe_header->OptionalHeader.SizeOfImage += packer_config.loader_size;
     }
 
     return 1;
@@ -117,14 +118,14 @@ int add_new_pe_section_data(t_pe *pe) {
         // For ASM
         loader_offset32 = ((t_pe32 *)pe)->section_header[sections_count - 1].VirtualAddress;
 
-        char *loader = patch_loader(x32_ARCH, PE32);
+        char *loader = patch_loader();
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
         char *new_section = malloc(((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData);
         memset(new_section, 0, ((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData);
-        memcpy(new_section, loader, I386_WIN_PE_LOADER_SIZE);
+        memcpy(new_section, loader, packer_config.loader_size);
         ((t_pe32 *)pe)->section_data[sections_count - 1] = new_section;
         free(loader);
     }
@@ -140,14 +141,14 @@ int add_new_pe_section_data(t_pe *pe) {
         // For ASM
         loader_offset64 = ((t_pe64 *)pe)->section_header[sections_count - 1].VirtualAddress;
 
-        char *loader = patch_loader(x64_ARCH, PE64);
+        char *loader = patch_loader();
         if (loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
         char *new_section = malloc(((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData);
         memset(new_section, 0, ((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData);
-        memcpy(new_section, loader, AMD64_WIN_PE_LOADER_SIZE);
+        memcpy(new_section, loader, packer_config.loader_size);
         ((t_pe64 *)pe)->section_data[sections_count - 1] = new_section;
         free(loader);
     }

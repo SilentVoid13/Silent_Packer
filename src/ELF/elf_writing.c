@@ -8,6 +8,7 @@
 #include "file_functions.h"
 #include "elf_packing_method.h"
 #include "loader_functions.h"
+#include "packer_config.h"
 #include "all_elf_loaders_infos.h"
 
 #include "log.h"
@@ -36,7 +37,7 @@ int write_elf(t_elf *elf, char *filename) {
 
                 // If we find the section with the code cave
                 if (method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
-                    write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size + I386_LINUX_ELF_LOADER_SIZE);
+                    write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size + packer_config.loader_size);
                 } else {
                     write_to_file(fd, ((t_elf32 *)elf)->section_data[i], ((t_elf32 *)elf)->section_header[i].sh_size);
                 }
@@ -64,7 +65,7 @@ int write_elf(t_elf *elf, char *filename) {
 
                 // If we find the section with the code cave
                 if (method_config.method_type == CODE_CAVE_METHOD && i == method_config.concerned_section) {
-                    write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size + AMD64_LINUX_ELF_LOADER_SIZE);
+                    write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size + packer_config.loader_size);
                 } else {
                     write_to_file(fd, ((t_elf64 *)elf)->section_data[i], ((t_elf64 *)elf)->section_header[i].sh_size);
                 }

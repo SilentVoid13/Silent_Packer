@@ -9,6 +9,7 @@
 #include "loader_functions.h"
 #include "elf_packing_method.h"
 #include "file_functions.h"
+#include "packer_config.h"
 #include "all_elf_loaders_infos.h"
 
 #include "log.h"
@@ -20,8 +21,8 @@ int set_new_elf_silvio_segment_values(t_elf *elf, int text_segment_index) {
     if(elf->s_type == ELF32) {
         loader_addr32 = ((t_elf32 *)elf)->prog_header[text_segment_index].p_vaddr + ((t_elf32 *)elf)->prog_header[text_segment_index].p_filesz;
 
-        ((t_elf32 *)elf)->prog_header[text_segment_index].p_filesz += I386_LINUX_ELF_LOADER_SIZE;
-        ((t_elf32 *)elf)->prog_header[text_segment_index].p_memsz += I386_LINUX_ELF_LOADER_SIZE;
+        ((t_elf32 *)elf)->prog_header[text_segment_index].p_filesz += packer_config.loader_size;
+        ((t_elf32 *)elf)->prog_header[text_segment_index].p_memsz += packer_config.loader_size;
 
         for (int i = text_segment_index + 1; i < ((t_elf32 *)elf)->elf_header->e_phnum; i++) {
             ((t_elf32 *)elf)->prog_header[i].p_offset += PAGE_SIZE32;
@@ -30,8 +31,8 @@ int set_new_elf_silvio_segment_values(t_elf *elf, int text_segment_index) {
     else {
         loader_addr64 = ((t_elf64 *)elf)->prog_header[text_segment_index].p_vaddr + ((t_elf64 *)elf)->prog_header[text_segment_index].p_filesz;
 
-        ((t_elf64 *)elf)->prog_header[text_segment_index].p_filesz += AMD64_LINUX_ELF_LOADER_SIZE;
-        ((t_elf64 *)elf)->prog_header[text_segment_index].p_memsz += AMD64_LINUX_ELF_LOADER_SIZE;
+        ((t_elf64 *)elf)->prog_header[text_segment_index].p_filesz += packer_config.loader_size;
+        ((t_elf64 *)elf)->prog_header[text_segment_index].p_memsz += packer_config.loader_size;
 
         for (int i = text_segment_index + 1; i < ((t_elf64 *)elf)->elf_header->e_phnum; i++) {
             ((t_elf64 *)elf)->prog_header[i].p_offset += PAGE_SIZE64;
@@ -45,7 +46,7 @@ int set_new_elf_silvio_section_values(t_elf *elf, int last_section_index) {
     if(elf->s_type == ELF32) {
         ((t_elf32 *)elf)->elf_header->e_shoff += PAGE_SIZE32;
 
-        ((t_elf32 *)elf)->section_header[last_section_index].sh_size += I386_LINUX_ELF_LOADER_SIZE;
+        ((t_elf32 *)elf)->section_header[last_section_index].sh_size += packer_config.loader_size;
 
         for (int i = last_section_index + 1; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
             ((t_elf32 *)elf)->section_header[i].sh_offset += PAGE_SIZE32;
@@ -54,7 +55,7 @@ int set_new_elf_silvio_section_values(t_elf *elf, int last_section_index) {
     else {
         ((t_elf64 *)elf)->elf_header->e_shoff += PAGE_SIZE64;
 
-        ((t_elf64 *)elf)->section_header[last_section_index].sh_size += AMD64_LINUX_ELF_LOADER_SIZE;
+        ((t_elf64 *)elf)->section_header[last_section_index].sh_size += packer_config.loader_size;
 
         for (int i = last_section_index + 1; i < ((t_elf64 *)elf)->elf_header->e_shnum; i++) {
             ((t_elf64 *)elf)->section_header[i].sh_offset += PAGE_SIZE64;
@@ -79,12 +80,12 @@ int elf_silvio_insert_loader(t_elf *elf, int section_index, int old_section_size
         // For ASM
         loader_offset32 = loader_addr32;
 
-        loader = patch_loader(x32_ARCH, ELF32);
+        loader = patch_loader();
         if(loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
-        memcpy(new_section_data + old_section_size, loader, I386_LINUX_ELF_LOADER_SIZE);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_infos_size);
     }
     else {
         size_t new_section_data_size = ((t_elf64 *)elf)->section_header[section_index].sh_size;
@@ -98,13 +99,13 @@ int elf_silvio_insert_loader(t_elf *elf, int section_index, int old_section_size
         // For ASM
         loader_offset64 = loader_addr64;
 
-        loader = patch_loader(x64_ARCH, ELF64);
+        loader = patch_loader();
         if(loader == NULL) {
             log_error("Error during loader patching");
             return -1;
 
         }
-        memcpy(new_section_data + old_section_size, loader, AMD64_LINUX_ELF_LOADER_SIZE);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
 
     return 1;
@@ -116,7 +117,6 @@ int elf_silvio_infect(t_elf *elf) {
         log_error("Couldn't find .text segment");
         return -1;
     }
-
 
     int last_section_index = find_last_elf_section_from_segment(elf, text_segment_index);
     if(last_section_index == -1) {

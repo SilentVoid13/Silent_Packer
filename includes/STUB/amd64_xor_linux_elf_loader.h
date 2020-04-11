@@ -3,14 +3,14 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#ifndef SILENT_PACKER_AMD64_LINUX_ELF_LOADER_H
-#define SILENT_PACKER_AMD64_LINUX_ELF_LOADER_H
+#ifndef SILENT_PACKER_AMD64_XOR_LINUX_ELF_LOADER_H
+#define SILENT_PACKER_AMD64_XOR_LINUX_ELF_LOADER_H
 
-#define AMD64_LINUX_ELF_LOADER_INFOS_SIZE 32
-#define AMD64_LINUX_ELF_LOADER_SIZE 146
+#define AMD64_XOR_LINUX_ELF_LOADER_INFOS_SIZE 32
+#define AMD64_XOR_LINUX_ELF_LOADER_SIZE 146
 
 #ifndef NO_PAYLOAD
-unsigned char amd64_linux_elf_loader_stub[] = {
+unsigned char amd64_xor_linux_elf_loader_stub[] = {
         0x9c, 0x50, 0x57, 0x56, 0x54, 0x52, 0x51, 0xb8, 0x01, 0x00, 0x00, 0x00, 0x48, 0x89, 0xc7, 0x48,
 0x8d, 0x35, 0x17, 0x00, 0x00, 0x00, 0xba, 0x10, 0x00, 0x00, 0x00, 0x0f, 0x05, 0x4c, 0x8d, 0x25,
 0xdc, 0xff, 0xff, 0xff, 0x4c, 0x2b, 0x25, 0x5f, 0x00, 0x00, 0x00, 0xeb, 0x10, 0x5b, 0x55, 0x6e,
@@ -24,4 +24,4 @@ unsigned char amd64_linux_elf_loader_stub[] = {
 };
 #endif // NO_PAYLOAD
 
-#endif // SILENT_PACKER_AMD64_LINUX_ELF_LOADER_H
+#endif //SILENT_PACKER_AMD64_XOR_LINUX_ELF_LOADER_H

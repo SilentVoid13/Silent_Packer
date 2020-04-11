@@ -12,6 +12,6 @@
 
 #include "elf_allocation.h"
 
-int encrypt_elf(t_elf *elf, char *cipher);
+int encrypt_elf(t_elf *elf);
 
 #endif //SILENT_PACKER_ENCRYPT_ELF_H

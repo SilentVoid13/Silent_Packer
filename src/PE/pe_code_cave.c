@@ -3,12 +3,13 @@
 // Copyright (c) 2020 SilentVoid. All rights reserved.
 //
 
-#include "pe_struct.h"
 #include "pe_code_cave.h"
+#include "pe_struct.h"
 #include "pe_allocation.h"
 #include "pe_functions.h"
 #include "loader_functions.h"
 #include "file_functions.h"
+#include "packer_config.h"
 #include "all_pe_loaders_infos.h"
 
 #include "log.h"
@@ -23,7 +24,7 @@ int find_pe_code_cave_index(t_pe *pe) {
 
                 //print_pe_section_info(pe, i);
 
-                if (code_cave_size > I386_WIN_PE_LOADER_SIZE) {
+                if (code_cave_size > packer_config.loader_size) {
                     return i;
                 }
             }
@@ -36,7 +37,7 @@ int find_pe_code_cave_index(t_pe *pe) {
 
                 //print_pe_section_info(pe, i);
 
-                if (code_cave_size > AMD64_WIN_PE_LOADER_SIZE) {
+                if (code_cave_size > packer_config.loader_size) {
                     return i;
                 }
             }
@@ -48,9 +49,9 @@ int find_pe_code_cave_index(t_pe *pe) {
 
 int set_new_pe_cave_section_values(t_pe *pe, int section_index) {
     if(pe->s_type == PE32)
-        ((t_pe32 *)pe)->section_header[section_index].Misc.VirtualSize += I386_WIN_PE_LOADER_SIZE;
+        ((t_pe32 *)pe)->section_header[section_index].Misc.VirtualSize += packer_config.loader_size;
     else
-        ((t_pe64 *)pe)->section_header[section_index].Misc.VirtualSize += AMD64_WIN_PE_LOADER_SIZE;
+        ((t_pe64 *)pe)->section_header[section_index].Misc.VirtualSize += packer_config.loader_size;
 
     // TODO: Change this to use mprotect in the loader
 
@@ -72,7 +73,7 @@ int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
     char *new_section_data;
 
     if(pe->s_type == PE32) {
-        new_section_data = realloc(((t_pe32 *)pe)->section_data[section_index], old_section_size + I386_WIN_PE_LOADER_SIZE);
+        new_section_data = realloc(((t_pe32 *)pe)->section_data[section_index], old_section_size + packer_config.loader_size);
         if (new_section_data == NULL) {
             log_error("realloc() failure");
             return -1;
@@ -82,15 +83,15 @@ int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
         // For ASM
         loader_offset32 = ((t_pe32 *)pe)->section_header[section_index].VirtualAddress + old_section_size;
 
-        char *loader = patch_loader(x32_ARCH, PE32);
+        char *loader = patch_loader();
         if(loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
-        memcpy(new_section_data + old_section_size, loader, I386_WIN_PE_LOADER_SIZE);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
     else {
-        new_section_data = realloc(((t_pe64 *)pe)->section_data[section_index], old_section_size + AMD64_WIN_PE_LOADER_SIZE);
+        new_section_data = realloc(((t_pe64 *)pe)->section_data[section_index], old_section_size + packer_config.loader_size);
         if (new_section_data == NULL) {
             log_error("realloc() failure");
             return -1;
@@ -100,12 +101,12 @@ int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
         // For ASM
         loader_offset64 = ((t_pe64 *)pe)->section_header[section_index].VirtualAddress + old_section_size;
 
-        char *loader = patch_loader(x64_ARCH, PE64);
+        char *loader = patch_loader();
         if(loader == NULL) {
             log_error("Error during loader patching");
             return -1;
         }
-        memcpy(new_section_data + old_section_size, loader, AMD64_WIN_PE_LOADER_SIZE);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
 
     return 1;

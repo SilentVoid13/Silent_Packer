@@ -56,10 +56,9 @@ start_unpacking:
 	popfq
 	jmp	0xFFFFFFFF
 
-
-; Random values here, to be patched
+; random values here, to be patched
 info_start:
-info_key:	    dq	0xEEEEEEEEEEEEEEEE
-info_addr:	    dq	0xAAAAAAAAAAAAAAAA
-info_size:	    dq  0xBBBBBBBBBBBBBBBB
-info_offset:    dq  0xCCCCCCCCCCCCCCCC
+info_key:	    dq	0xaaaaaaaaaaaaaaaa
+info_addr:	    dq	0xbbbbbbbbbbbbbbbb
+info_size:	    dq  0xcccccccccccccccc
+info_offset:    dq  0xdddddddddddddddd

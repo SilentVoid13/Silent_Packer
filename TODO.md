@@ -70,3 +70,9 @@ s_elf struct :
 - [ ] section_data\[i\] (pe_allocation)
 - [ ] section_data\[i\]\[i\] (pe_allocation)
 - [ ] loader (loader_functions)
+
+## AES
+
+- [ ] Add AES-128-ECB support for PE32, PE32+, ELF32
+- [ ] Add AES-128-CBC
+- [ ] Add AES-256
