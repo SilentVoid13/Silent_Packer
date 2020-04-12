@@ -14,7 +14,7 @@ Silent_Packer is licensed under the GNU AGPLv3 license. Refer to [LICENSE](https
 
 > Binary packers alter the original binary data, and restore it (more or less) before execution.
 
-Silent_Packer is a very basic and common packer, encrypting the code section from the binary (`.text`) and decrypting it before executing it. This technique can be used to obfuscate the binary code to bypass antivirus or to make reverse engineering harder. Packers can also be used to compress a binary to reduce its size.
+Silent_Packer is a very basic and common packer, encrypting the code section from the binary (`.text`) and decrypting it before executing it. This technique can be used to obfuscate the binary code to bypass antiviruses or to make reverse engineering harder. Packers can also be used to compress a binary to reduce its size.
 
 You can find a more detailed stackoverflow post [here](https://reverseengineering.stackexchange.com/questions/1779/what-are-the-different-types-of-packers).
 
@@ -36,7 +36,7 @@ Silent_Packer currently support the following cipher methods :
 - XOR
 - AES-128-ECB
 
-Support for some more secure AES modes should arrive soon (AES-128-CBC, AES-256)
+Support for some more secure AES modes should arrive soon (AES-128-CBC, AES-256, ...)
 
 You can suggest me a cipher method that you want me to add.
 
@@ -70,7 +70,7 @@ You can either get the compiled version from the latest [release](https://github
 
 This project relies on [Silent_Log](https://github.com/SilentVoid13/Silent_Log) for logging messages.
 
-To build it yourself you will need `cmake` and `gcc`.
+To build it yourself you will need `cmake`, `gcc` and `nasm`.
 
 No windows version is available at the moment.
 
@@ -83,13 +83,13 @@ make
 make install
 ```
 
-Compiled binary will be available in the **bin** directory.
+The compiled binary will be available in the **bin** directory.
 
 ## Known_bugs
 
 Feel free to report any bugs, so that I can fix them.
 
-The PE packer have some bugs, especially with big binaries with a lot of dynamic libs. The section insertion method has a weird behavior sometimes (adding some null bytes at the beginning of the section making the offsets wrong).
+The packer has some recurrent bugs with PE files, especially with big binaries with a lot of dynamic libs. The section insertion method has a weird behavior sometimes (adding some null bytes at the beginning of the section making the offsets wrong).
 
 ## Contributing
 
@@ -97,4 +97,4 @@ Feel free to contribute. See the [TODO](https://github.com/SilentVoid13/Silent_P
 
 ## Disclaimer
 
-I am not responsible for what you do with the information and code  provided. This is intended for professional or educational purposes  only.
+I am not responsible for what you do with the information and code provided. This is intended for professional or educational purposes only.
