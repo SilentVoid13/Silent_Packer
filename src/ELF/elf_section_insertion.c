@@ -184,6 +184,7 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 
         loader = patch_loader(x32_ARCH, ELF32, packer_config.cipher);
         if (loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
@@ -211,12 +212,22 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 
         // We set a new proper section name
         if (set_new_elf_section_string_table(elf) == -1) {
+            free(loader);
             log_error("Error setting new string table");
             return -1;
         }
 
         // Inserting our new loadable section after the last loadable section
         memcpy(new_section_headers + last_loadable_section_index, &new_section32, sizeof(Elf32_Shdr));
+        char *new_section_d = malloc(new_section32.sh_size);
+        if(new_section_d == NULL) {
+            free(loader);
+            free(new_section_d);
+            log_error("malloc() failure");
+            return -1;
+        }
+        memcpy(new_section_d, loader, packer_config.loader_size);
+        ((t_elf32 *)elf)->section_data[last_loadable_section_index] = new_section_d;
     }
     else {
         Elf64_Shdr *new_section_headers;
@@ -251,6 +262,7 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 
         loader = patch_loader();
         if (loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
@@ -273,14 +285,23 @@ int elf_section_create_new_section(t_elf *elf, int last_pt_load_index, int last_
 
         // We set a new proper section name
         if (set_new_elf_section_string_table(elf) == -1) {
+            free(loader);
             log_error("Error setting new string table");
             return -1;
         }
 
         memcpy(new_section_headers + last_loadable_section_index, &new_section64, sizeof(Elf64_Shdr));
+        char *new_section_d = malloc(new_section64.sh_size);
+        if(new_section_d == NULL) {
+            free(loader);
+            free(new_section_d);
+            log_error("malloc() failure");
+            return -1;
+        }
+        memcpy(new_section_d, loader, packer_config.loader_size);
+        ((t_elf64 *)elf)->section_data[last_loadable_section_index] = new_section_d;
     }
-    new_section_data[last_loadable_section_index] = loader;
-
+    free(loader);
 
     // Fixing sh_link symbol_table index value
     // https://docs.oracle.com/cd/E19683-01/816-1386/6m7qcoblj/index.html#chapter6-47976

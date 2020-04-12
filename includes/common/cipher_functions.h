@@ -21,11 +21,11 @@ extern uint64_t text_data_size64;
 extern uint64_t text_entry_point64;
 extern uint64_t cipher_key64;
 
-extern unsigned char *cipher_key128;
+extern unsigned char cipher_key128[17];
 
 uint32_t generate_random_key32();
 uint64_t generate_random_key64();
-unsigned char * generate_random_key128();
+void generate_random_key128();
 
 uint32_t rotate_right32(uint32_t value);
 uint64_t rotate_right64(uint64_t value);

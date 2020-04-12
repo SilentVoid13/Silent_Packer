@@ -25,6 +25,7 @@
 
 int allocate_file(char *file, void **file_data, size_t *file_data_size);
 int write_to_file(int fd, void *data, size_t data_size);
+int dump_to_file(char *filename, char *data, size_t data_size);
 void add_zero_padding(int fd, size_t end_offset);
 int check_magic_bytes(char *file_data, size_t file_data_size);
 int get_elf_arch(const char *file_data, size_t file_data_size);

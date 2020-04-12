@@ -5,6 +5,7 @@
 
 #include "elf_packing.h"
 #include "elf_allocation.h"
+#include "elf_deallocation.h"
 #include "file_functions.h"
 #include "elf_encryption.h"
 #include "elf_writing.h"
@@ -39,6 +40,7 @@ int pack_elf(char *file, char *file_data, size_t file_data_size, char *output) {
 
     t_elf *elf = NULL;
     if(allocate_elf(&elf, file_data, file_data_size) == -1) {
+        munmap(file_data, file_data_size);
         log_error("Error during ELF allocation");
         return -1;
     }
@@ -48,12 +50,14 @@ int pack_elf(char *file, char *file_data, size_t file_data_size, char *output) {
 
     log_info("Encrypting .text section ...");
     if(encrypt_elf(elf) == -1) {
+        deallocate_elf(elf);
         log_error("Error during ELF encryption");
         return -1;
     }
 
     log_info("Packing using specified method ...");
     if(elf_pack_using_method(elf) == -1) {
+        deallocate_elf(elf);
         log_error("Error during ELF packing");
         return -1;
     }
@@ -66,11 +70,13 @@ int pack_elf(char *file, char *file_data, size_t file_data_size, char *output) {
 
     log_info("Writing Packed ELF to file ...");
     if(write_elf(elf, filename) == -1) {
+        deallocate_elf(elf);
         log_error("Error during new ELF writing");
         return -1;
     }
 
     log_success("File %s packed into %s !", file, filename);
+    deallocate_elf(elf);
 
     return 1;
 }

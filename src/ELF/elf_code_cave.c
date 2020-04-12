@@ -108,6 +108,7 @@ int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) 
 
         loader = patch_loader();
         if(loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
@@ -125,11 +126,13 @@ int elf_cave_insert_loader(t_elf *elf, int section_index, int old_section_size) 
 
         loader = patch_loader();
         if(loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
         memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
+    free(loader);
 
     return 1;
 }

@@ -97,11 +97,13 @@ int main(int argc, char** argv) {
             if(file_type == ELF_FILE) {
                 int arch = get_elf_arch(file_data, file_data_size);
                 if(arch == UNKNOWN_ARCH) {
+                    munmap(file_data, file_data_size);
                     log_error("Couldn't detect the architecture of the file");
                     return -1;
                 }
 
                 if(fill_packer_config((char *) packing_method->sval[0], (char *) cipher->sval[0], arch, file_type, debug->count) == -1) {
+                    munmap(file_data, file_data_size);
                     log_error("Error during packer configuration");
                     return -1;
                 }
@@ -114,16 +116,19 @@ int main(int argc, char** argv) {
             else if(file_type == PE_FILE) {
                 int arch = get_pe_arch(file_data, file_data_size);
                 if(arch == UNKNOWN_ARCH) {
+                    munmap(file_data, file_data_size);
                     log_error("Couldn't detect the architecture of the file");
                     return -1;
                 }
 
                 if(strcmp(packing_method->sval[0], "silvio_infection") == 0) {
+                    munmap(file_data, file_data_size);
                     log_error("Silvio infection is not available for PE files");
                     return -1;
                 }
 
                 if(fill_packer_config((char *) packing_method->sval[0], (char *) cipher->sval[0], arch, file_type, debug->count) == -1) {
+                    munmap(file_data, file_data_size);
                     log_error("Error during packer configuration");
                     return -1;
                 }

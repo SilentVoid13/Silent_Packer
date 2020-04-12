@@ -4,6 +4,7 @@
 //
 
 #include "elf_allocation.h"
+#include "elf_deallocation.h"
 #include "file_functions.h"
 #include "packer_config.h"
 
@@ -20,6 +21,7 @@ int allocate_elf_elf_header(t_elf *elf, void *file_data, size_t file_data_size) 
 
         ((t_elf32 *)elf)->elf_header = malloc(sizeof(Elf32_Ehdr));
         if (((t_elf32 *)elf)->elf_header == NULL) {
+            deallocate_elf_elf_header(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -28,11 +30,13 @@ int allocate_elf_elf_header(t_elf *elf, void *file_data, size_t file_data_size) 
         // https://code.woboq.org/userspace/glibc/elf/elf.h.html
         // "\177ELF"
         if (strncmp((char *) ((t_elf32 *)elf)->elf_header->e_ident, ELFMAG, SELFMAG) != 0) {
+            deallocate_elf_elf_header(elf);
             log_error("Magic bytes does not match ELF bytes");
             return -1;
         }
 
         if (((t_elf32 *)elf)->elf_header->e_machine != EM_386) {
+            deallocate_elf_elf_header(elf);
             log_error("File is not a x32 executable");
             return -1;
         }
@@ -45,6 +49,7 @@ int allocate_elf_elf_header(t_elf *elf, void *file_data, size_t file_data_size) 
 
         ((t_elf64 *)elf)->elf_header = malloc(sizeof(Elf64_Ehdr));
         if (((t_elf64 *)elf)->elf_header == NULL) {
+            deallocate_elf_elf_header(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -53,11 +58,13 @@ int allocate_elf_elf_header(t_elf *elf, void *file_data, size_t file_data_size) 
         // https://code.woboq.org/userspace/glibc/elf/elf.h.html
         // "\177ELF"
         if (strncmp((char *) ((t_elf64 *)elf)->elf_header->e_ident, ELFMAG, SELFMAG) != 0) {
+            deallocate_elf_elf_header(elf);
             log_error("Magic bytes does not match ELF bytes");
             return -1;
         }
 
         if (((t_elf64 *)elf)->elf_header->e_machine != EM_X86_64) {
+            deallocate_elf_elf_header(elf);
             log_error("File is not a x64 executable");
             return -1;
         }
@@ -76,6 +83,7 @@ int allocate_elf_program_header(t_elf *elf, void *file_data, size_t file_data_si
 
         ((t_elf32 *)elf)->prog_header = malloc(elf_program_header_size);
         if (((t_elf32 *)elf)->prog_header == NULL) {
+            deallocate_elf_program_header(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -90,6 +98,7 @@ int allocate_elf_program_header(t_elf *elf, void *file_data, size_t file_data_si
 
         ((t_elf64 *)elf)->prog_header = malloc(elf_program_header_size);
         if (((t_elf64 *)elf)->prog_header == NULL) {
+            deallocate_elf_program_header(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -105,6 +114,7 @@ int allocate_elf_sections_header(t_elf *elf, void *file_data, size_t file_data_s
 
         ((t_elf32 *)elf)->section_header = malloc(elf_sections_header_size);
         if (((t_elf32 *)elf)->section_header == NULL) {
+            deallocate_elf_sections_header(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -112,6 +122,7 @@ int allocate_elf_sections_header(t_elf *elf, void *file_data, size_t file_data_s
 
         for (int i = 0; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
             if (file_data_size < ((t_elf32 *)elf)->elf_header->e_shoff + (i * sizeof(Elf32_Shdr))) {
+                deallocate_elf_sections_header(elf);
                 log_error("Total file size is inferior to ELF section header size");
                 return -1;
             }
@@ -124,6 +135,7 @@ int allocate_elf_sections_header(t_elf *elf, void *file_data, size_t file_data_s
 
         ((t_elf64 *)elf)->section_header = malloc(elf_sections_header_size);
         if (((t_elf64 *)elf)->section_header == NULL) {
+            deallocate_elf_sections_header(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -131,6 +143,7 @@ int allocate_elf_sections_header(t_elf *elf, void *file_data, size_t file_data_s
 
         for (int i = 0; i < ((t_elf64 *)elf)->elf_header->e_shnum; i++) {
             if (file_data_size < ((t_elf64 *)elf)->elf_header->e_shoff + (i * sizeof(Elf64_Shdr))) {
+                deallocate_elf_sections_header(elf);
                 log_error("Total file size is inferior to ELF section header size");
                 return -1;
             }
@@ -146,11 +159,13 @@ int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_siz
     if(elf->s_type == ELF32) {
         ((t_elf32 *)elf)->section_data = malloc(sizeof(char *) * ((t_elf32 *)elf)->elf_header->e_shnum);
         if (((t_elf32 *)elf)->section_data == NULL) {
+            deallocate_elf_sections_data(elf);
             log_error("malloc() failure");
             return -1;
         }
         memset(((t_elf32 *)elf)->section_data, 0, sizeof(char *) * ((t_elf32 *)elf)->elf_header->e_shnum);
 
+        // TODO: Free all the malloc section_data_data up to i
         size_t elf_section_data_size;
         for (int i = 0; i < ((t_elf32 *)elf)->elf_header->e_shnum; i++) {
             // Section that occupies no space in file
@@ -166,6 +181,7 @@ int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_siz
 
                 ((t_elf32 *)elf)->section_data[i] = malloc(elf_section_data_size);
                 if (((t_elf32 *)elf)->section_data[i] == NULL) {
+                    free(((t_elf32 *)elf)->section_data[i]);
                     log_error("malloc() failure");
                     return -1;
                 }
@@ -177,6 +193,7 @@ int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_siz
     else {
         ((t_elf64 *)elf)->section_data = malloc(sizeof(char *) * ((t_elf64 *)elf)->elf_header->e_shnum);
         if (((t_elf64 *)elf)->section_data == NULL) {
+            deallocate_elf_sections_data(elf);
             log_error("malloc() failure");
             return -1;
         }
@@ -197,6 +214,7 @@ int allocate_elf_sections_data(t_elf *elf, void *file_data, size_t file_data_siz
 
                 ((t_elf64 *)elf)->section_data[i] = malloc(elf_section_data_size);
                 if (((t_elf64 *)elf)->section_data[i] == NULL) {
+                    free(((t_elf64 *)elf)->section_data[i]);
                     log_error("malloc() failure");
                     return -1;
                 }
@@ -219,11 +237,11 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
 
     *elf = malloc(t_elf_size);
     if(*elf == NULL) {
+        deallocate_elf_struct(*elf);
         log_error("malloc() failure");
         return -1;
     }
     memset(*elf, 0, t_elf_size);
-
 
     t_elf type_pe;
     if(packer_config.arch == 32) {
@@ -245,6 +263,7 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
     log_verbose("Allocating Program Header ...");
 
     if(allocate_elf_program_header(*elf, file_data, file_data_size) == -1) {
+        deallocate_elf_elf_header(*elf);
         log_error("Error during Program Header allocation");
         return -1;
     }
@@ -252,6 +271,8 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
     log_verbose("Allocating Sections Headers ...");
 
     if(allocate_elf_sections_header(*elf, file_data, file_data_size) == -1) {
+        deallocate_elf_elf_header(*elf);
+        deallocate_elf_program_header(*elf);
         log_error("Error during Section Header allocation");
         return -1;
     }
@@ -259,6 +280,9 @@ int allocate_elf(t_elf **elf, void *file_data, size_t file_data_size) {
     log_verbose("Allocating Sections Data ...");
 
     if(allocate_elf_sections_data(*elf, file_data, file_data_size) == -1) {
+        deallocate_elf_elf_header(*elf);
+        deallocate_elf_program_header(*elf);
+        deallocate_elf_sections_header(*elf);
         log_error("Error during Section Data allocation");
         return -1;
     }

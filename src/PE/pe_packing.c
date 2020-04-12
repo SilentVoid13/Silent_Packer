@@ -5,6 +5,7 @@
 
 #include "pe_packing.h"
 #include "pe_allocation.h"
+#include "pe_deallocation.h"
 #include "file_functions.h"
 #include "packer_config.h"
 #include "pe_writing.h"
@@ -19,6 +20,7 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *output) {
 
     t_pe *pe = NULL;
     if (allocate_pe(&pe, file_data, file_data_size, packer_config.arch) == -1) {
+        munmap(file_data, file_data_size);
         log_error("Error during PE allocation");
         return -1;
     }
@@ -28,12 +30,14 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *output) {
 
     log_info("Encrypting .text section ...");
     if(encrypt_pe(pe) == -1) {
+        deallocate_pe(pe);
         log_error("Error during PE encryption");
         return -1;
     }
 
     log_info("Packing using specified method ...");
     if(pe_pack_using_method(pe) == -1) {
+        deallocate_pe(pe);
         log_error("Error during PE packing");
         return -1;
     }
@@ -46,11 +50,13 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *output) {
 
     log_info("Writing Packed PE to file ...");
     if(write_pe(pe, filename) == -1) {
+        deallocate_pe(pe);
         log_error("Error during new PE writing");
         return -1;
     }
 
     log_success("File %s packed into %s !", file, filename);
+    deallocate_pe(pe);
 
     return 1;
 }

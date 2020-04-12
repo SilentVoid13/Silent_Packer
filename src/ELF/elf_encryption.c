@@ -9,6 +9,7 @@
 #include "elf_functions.h"
 #include "loader_functions.h"
 #include "packer_config.h"
+#include "file_functions.h"
 #include "aes_128_ecb_encryption.h"
 
 #include "log.h"
@@ -30,12 +31,9 @@ int encrypt_elf(t_elf *elf) {
         text_data_size32 = ((t_elf32 *)elf)->section_header[text_section_index].sh_size;
         text_entry_point32 = ((t_elf32 *)elf)->section_header[text_section_index].sh_addr;
 
-        FILE *dump;
         if(packer_config.debug_mode) {
             log_debug("Dumping .text ...");
-            dump = fopen("text32.dmp", "w");
-            fwrite(text_data, text_data_size32, 1, dump);
-            fclose(dump);
+            dump_to_file("text32.dmp", text_data, text_data_size32);
         }
 
         log_verbose("Generating random key ...");
@@ -47,11 +45,8 @@ int encrypt_elf(t_elf *elf) {
             xor_encrypt32(text_data, text_data_size32, temp_key);
         }
         else if(strcmp(packer_config.cipher, "aes128_ecb") == 0) {
-            cipher_key128 = generate_random_key128();
-            if(cipher_key128 == NULL) {
-                log_error("Error during key generation");
-                return -1;
-            }
+            generate_random_key128();
+
             log_info("Random key : ");
             for(int i = 0; i < 16; i++)
                 printf("%02x", cipher_key128[i]);
@@ -62,9 +57,7 @@ int encrypt_elf(t_elf *elf) {
 
         if(packer_config.debug_mode) {
             log_debug("Dumping encrypted .text ...");
-            dump = fopen("text32_encrypted.dmp", "w");
-            fwrite(text_data, text_data_size32, 1, dump);
-            fclose(dump);
+            dump_to_file("text32_encrypted.dmp", text_data, text_data_size32);
         }
     }
     else {
@@ -74,12 +67,9 @@ int encrypt_elf(t_elf *elf) {
         text_data_size64 = ((t_elf64 *)elf)->section_header[text_section_index].sh_size;
         text_entry_point64 = ((t_elf64 *)elf)->section_header[text_section_index].sh_addr;
 
-        FILE *dump;
         if(packer_config.debug_mode) {
             log_debug("Dumping .text ...");
-            dump = fopen("text64.dmp", "w");
-            fwrite(text_data, text_data_size64, 1, dump);
-            fclose(dump);
+            dump_to_file("text64.dmp", text_data, text_data_size64);
         }
 
         log_verbose("Generating random key ...");
@@ -91,11 +81,8 @@ int encrypt_elf(t_elf *elf) {
             xor_encrypt64(text_data, text_data_size64, temp_key);
         }
         else if(strcmp(packer_config.cipher, "aes128_ecb") == 0) {
-            cipher_key128 = generate_random_key128();
-            if(cipher_key128 == NULL) {
-                log_error("Error during key generation");
-                return -1;
-            }
+            generate_random_key128();
+
             log_info("Random key : ");
             for(int i = 0; i < 16; i++)
                 printf("%02x", cipher_key128[i]);
@@ -106,9 +93,7 @@ int encrypt_elf(t_elf *elf) {
 
         if(packer_config.debug_mode) {
             log_debug("Dumping encrypted .text ...");
-            dump = fopen("text64_encrypted.dmp", "w");
-            fwrite(text_data, text_data_size64, 1, dump);
-            fclose(dump);
+            dump_to_file("text64_encrypted.dmp", text_data, text_data_size64);
         }
     }
 

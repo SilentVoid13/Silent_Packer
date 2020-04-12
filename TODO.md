@@ -10,12 +10,12 @@
 - [ ] Clean code
 - [ ] Add mprotect in loader
 - [x] Add functions prototypes
-- [ ] Add malloc variable free
 - [x] Add file recognition (ELF or PE)
 - [x] Add file arch recognition (x32 or x64) 
-- [ ] Free malloc variables
+- [x] Free malloc variables
 - [x] Add submodule warning in makefile
 - [ ] Add possibility to add a custom stub (no encryption just executing stub before jumping to main)
+- [ ] Add more packing methods
 
 ## ELF
 
@@ -37,14 +37,14 @@
 
 s_elf struct :
 
-- [ ] t_elf (elf_allocation)
-- [ ] elf_header (elf_allocation)
-- [ ] prog_header (elf_allocation)
-- [ ] section_header (elf_allocation)
-- [ ] section_data\[i\]  (elf_allocation)
-- [ ] section_data\[i\]\[i\] (elf_allocation)
+- [x] t_elf (elf_allocation)
+- [x] elf_header (elf_allocation)
+- [x] prog_header (elf_allocation)
+- [x] section_header (elf_allocation)
+- [x] section_data  (elf_allocation)
+- [x] section_data\[i\] (elf_allocation)
 
-- [ ] loader (loader_functions)
+- [x] loader (loader_functions)
 
 ## PE
 
@@ -62,14 +62,15 @@ s_elf struct :
 
 ### Heap allocated variables
 
-- [ ] t_pe64 (pe_allocation)
-- [ ] dos_header (pe_allocation)
-- [ ] dos_stub (pe_allocation)
-- [ ] pe_header (pe_allocation)
-- [ ] section_header (pe_allocation)
-- [ ] section_data\[i\] (pe_allocation)
-- [ ] section_data\[i\]\[i\] (pe_allocation)
-- [ ] loader (loader_functions)
+- [x] t_pe64 (pe_allocation)
+- [x] dos_header (pe_allocation)
+- [x] dos_stub (pe_allocation)
+- [x] pe_header (pe_allocation)
+- [x] section_header (pe_allocation)
+- [x] section_data (pe_allocation)
+- [x] section_data\[i\] (pe_allocation)
+
+- [x] loader (loader_functions)
 
 ## AES
 

@@ -117,6 +117,8 @@ int set_new_pe_header_values(t_pe *pe) {
 }
 
 int add_new_pe_section_data(t_pe *pe) {
+    char *loader;
+
     if(pe->s_type == PE32) {
         int sections_count = ((t_pe32 *)pe)->pe_header->FileHeader.NumberOfSections;
         char **new_section_data = realloc(((t_pe32 *)pe)->section_data, sizeof(char *) * sections_count);
@@ -129,16 +131,22 @@ int add_new_pe_section_data(t_pe *pe) {
         // For ASM
         loader_offset32 = ((t_pe32 *)pe)->section_header[sections_count - 1].VirtualAddress;
 
-        char *loader = patch_loader();
+        loader = patch_loader();
         if (loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
         char *new_section = malloc(((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData);
+        if(new_section == NULL) {
+            free(loader);
+            free(new_section);
+            log_error("malloc() failure");
+            return -1;
+        }
         memset(new_section, 0, ((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData);
         memcpy(new_section, loader, packer_config.loader_size);
         ((t_pe32 *)pe)->section_data[sections_count - 1] = new_section;
-        free(loader);
     }
     else {
         int sections_count = ((t_pe64 *)pe)->pe_header->FileHeader.NumberOfSections;
@@ -152,17 +160,24 @@ int add_new_pe_section_data(t_pe *pe) {
         // For ASM
         loader_offset64 = ((t_pe64 *)pe)->section_header[sections_count - 1].VirtualAddress;
 
-        char *loader = patch_loader();
+        loader = patch_loader();
         if (loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
         char *new_section = malloc(((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData);
+        if(new_section == NULL) {
+            free(loader);
+            free(new_section);
+            log_error("malloc() failure");
+            return -1;
+        }
         memset(new_section, 0, ((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData);
         memcpy(new_section, loader, packer_config.loader_size);
         ((t_pe64 *)pe)->section_data[sections_count - 1] = new_section;
-        free(loader);
     }
+    free(loader);
 
     return 1;
 }

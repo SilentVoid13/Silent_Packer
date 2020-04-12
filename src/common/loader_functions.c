@@ -22,7 +22,7 @@ uint32_t text_entry_point32;
 uint32_t cipher_key32;
 uint32_t loader_offset32;
 
-unsigned char *cipher_key128;
+unsigned char cipher_key128[17];
 
 // Set globals variables for nasm code
 char * patch_loader() {
@@ -72,10 +72,8 @@ char * patch_loader() {
     }
 
     if(packer_config.debug_mode) {
-        FILE *dump;
-        dump = fopen("loader.dmp", "w");
-        fwrite(loader, packer_config.loader_size, 1, dump);
-        fclose(dump);
+        log_debug("Dumping loader ...");
+        dump_to_file("loader.dmp", loader, packer_config.loader_size);
     }
 
     return loader;

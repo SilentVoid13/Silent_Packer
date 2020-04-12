@@ -25,6 +25,7 @@ int allocate_file(char *file, void **file_data, size_t *file_data_size) {
 
     int size = lseek(fd, 0, SEEK_END);
     if(size < 0) {
+        close(fd);
         log_error("lseek() failure");
         return -1;
     }
@@ -32,6 +33,7 @@ int allocate_file(char *file, void **file_data, size_t *file_data_size) {
 
     *file_data = mmap(NULL, *file_data_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0); // NOLINT(hicpp-signed-bitwise)
     if(*file_data == MAP_FAILED) {
+        close(fd);
         log_error("mmap() failure");
         return -1;
     }
@@ -47,6 +49,19 @@ int write_to_file(int fd, void *data, size_t data_size) {
         return -1;
     }
     offset += n_bytes;
+
+    return 1;
+}
+
+int dump_to_file(char *filename, char *data, size_t data_size) {
+    FILE *dump;
+    dump = fopen(filename, "w");
+    if(dump == NULL) {
+        log_error("Error dumping file");
+        return -1;
+    }
+    fwrite(data, data_size, 1, dump);
+    fclose(dump);
 
     return 1;
 }

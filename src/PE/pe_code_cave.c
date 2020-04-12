@@ -71,6 +71,7 @@ int set_new_pe_cave_section_values(t_pe *pe, int section_index) {
 
 int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
     char *new_section_data;
+    char *loader;
 
     if(pe->s_type == PE32) {
         new_section_data = realloc(((t_pe32 *)pe)->section_data[section_index], old_section_size + packer_config.loader_size);
@@ -83,8 +84,9 @@ int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
         // For ASM
         loader_offset32 = ((t_pe32 *)pe)->section_header[section_index].VirtualAddress + old_section_size;
 
-        char *loader = patch_loader();
+        loader = patch_loader();
         if(loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
@@ -101,13 +103,15 @@ int pe_cave_insert_loader(t_pe *pe, int section_index, int old_section_size) {
         // For ASM
         loader_offset64 = ((t_pe64 *)pe)->section_header[section_index].VirtualAddress + old_section_size;
 
-        char *loader = patch_loader();
+        loader = patch_loader();
         if(loader == NULL) {
+            free(loader);
             log_error("Error during loader patching");
             return -1;
         }
         memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
+    free(loader);
 
     return 1;
 }

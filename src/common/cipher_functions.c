@@ -23,31 +23,24 @@ uint64_t generate_random_key64() {
     return key;
 }
 
-unsigned char * generate_random_key128() {
-    unsigned char *key = malloc(16);
-    if(key == NULL) {
-        log_error("malloc() failure");
-        return NULL;
-    }
-
+void generate_random_key128() {
     srand(time(NULL)); // NOLINT(cert-msc32-c,cert-msc51-cpp)
+
     uint32_t first = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
     uint32_t second = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
     uint32_t third = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
     uint32_t fourth = rand();// NOLINT(cert-msc30-c,cert-msc50-cpp)
 
-    memcpy(key, &first, sizeof(uint32_t));
-    memcpy(key+4, &second, sizeof(uint32_t));
-    memcpy(key+8, &third, sizeof(uint32_t));
-    memcpy(key+12, &fourth, sizeof(uint32_t));
+    memcpy(cipher_key128, &first, sizeof(uint32_t));
+    memcpy(cipher_key128+4, &second, sizeof(uint32_t));
+    memcpy(cipher_key128+8, &third, sizeof(uint32_t));
+    memcpy(cipher_key128+12, &fourth, sizeof(uint32_t));
 
     //uint32_t test = 0x41414141;
     //memcpy(key, &test, sizeof(uint32_t));
     //memcpy(key+4, &test, sizeof(uint32_t));
     //memcpy(key+8, &test, sizeof(uint32_t));
     //memcpy(key+12, &test, sizeof(uint32_t));
-
-    return key;
 }
 
 uint32_t rotate_right32(uint32_t value) {
