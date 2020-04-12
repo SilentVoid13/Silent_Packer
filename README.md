@@ -2,7 +2,7 @@
 
 Silent_Packer is an ELF / PE packer written in pure C.
 
-This program can be used to obfuscate a binary.
+This program can be used to obfuscate a binary. This packer supports PIE binaries.
 
 My code is surely not perfect, do not hesitate to make pull requests or to contact me for any problems / code enhancement suggestion at [silentvoid13@protonmail.com](mailto:silentvoid13@protonmail.com).
 
@@ -35,8 +35,6 @@ Silent_Packer currently support the following cipher methods :
 
 - XOR
 - AES-128-ECB
-
-AES is currently only available for ELF64. Support for other file formats should arrive soon.
 
 Support for some more secure AES modes should arrive soon (AES-128-CBC, AES-256)
 

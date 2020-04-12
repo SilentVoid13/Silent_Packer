@@ -23,11 +23,9 @@ int fill_packer_config(char *packing_method, char *cipher, int arch, int file_ty
     if(arch == x32_ARCH) {
         if (file_type == ELF_FILE) {
             if (strcmp(cipher, "aes128_ecb") == 0) {
-                log_error("AES-128-ECB is not currently available for ELF 32 bit");
-                return -1;
-                //packer_config.loader_infos_size = I386_AES_128_ECB_LINUX_ELF_LOADER_INFOS_SIZE;
-                //packer_config.loader_size = I386_AES_128_ECB_LINUX_ELF_LOADER_SIZE;
-                //packer_config.loader_stub = &(i386_aes_128_ecb_linux_elf_loader_stub[0]);
+                packer_config.loader_infos_size = I386_AES_128_ECB_LINUX_ELF_LOADER_INFOS_SIZE;
+                packer_config.loader_size = I386_AES_128_ECB_LINUX_ELF_LOADER_SIZE;
+                packer_config.loader_stub = &(i386_aes_128_ecb_linux_elf_loader_stub[0]);
             } else if (strcmp(cipher, "xor") == 0) {
                 packer_config.loader_infos_size = I386_XOR_LINUX_ELF_LOADER_INFOS_SIZE;
                 packer_config.loader_size = I386_XOR_LINUX_ELF_LOADER_SIZE;
@@ -39,11 +37,9 @@ int fill_packer_config(char *packing_method, char *cipher, int arch, int file_ty
             }
         } else if (file_type == PE_FILE) {
             if (strcmp(cipher, "aes128_ecb") == 0) {
-                log_error("AES-128-ECB is not currently available for PE files");
-                return -1;
-                //packer_config.loader_infos_size = I386_AES_128_ECB_WIN_PE_LOADER_INFOS_SIZE;
-                //packer_config.loader_size = I386_AES_128_ECB_WIN_PE_LOADER_SIZE;
-                //packer_config.loader_stub = &(i386_aes_128_ecb_win_pe_loader_stub[0]);
+                packer_config.loader_infos_size = I386_AES_128_ECB_WIN_PE_LOADER_INFOS_SIZE;
+                packer_config.loader_size = I386_AES_128_ECB_WIN_PE_LOADER_SIZE;
+                packer_config.loader_stub = &(i386_aes_128_ecb_win_pe_loader_stub[0]);
             } else if (strcmp(cipher, "xor") == 0) {
                 packer_config.loader_infos_size = I386_XOR_WIN_PE_LOADER_INFOS_SIZE;
                 packer_config.loader_size = I386_XOR_WIN_PE_LOADER_SIZE;
@@ -78,11 +74,9 @@ int fill_packer_config(char *packing_method, char *cipher, int arch, int file_ty
         }
         else if(file_type == PE_FILE) {
             if(strcmp(cipher, "aes128_ecb") == 0) {
-                log_error("AES-128-ECB is not currently available for PE files");
-                return -1;
-                //packer_config.loader_infos_size = AMD64_AES_128_ECB_WIN_PE_LOADER_INFOS_SIZE;
-                //packer_config.loader_size = AMD64_AES_128_ECB_WIN_PE_LOADER_SIZE;
-                //packer_config.loader_stub = amd64_aes_128_ecb_win_pe_loader_stub;
+                packer_config.loader_infos_size = AMD64_AES_128_ECB_WIN_PE_LOADER_INFOS_SIZE;
+                packer_config.loader_size = AMD64_AES_128_ECB_WIN_PE_LOADER_SIZE;
+                packer_config.loader_stub = amd64_aes_128_ecb_win_pe_loader_stub;
             }
             else if(strcmp(cipher, "xor") == 0) {
                 packer_config.loader_infos_size = AMD64_XOR_WIN_PE_LOADER_INFOS_SIZE;

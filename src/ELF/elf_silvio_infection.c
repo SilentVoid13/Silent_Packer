@@ -85,7 +85,7 @@ int elf_silvio_insert_loader(t_elf *elf, int section_index, int old_section_size
             log_error("Error during loader patching");
             return -1;
         }
-        memcpy(new_section_data + old_section_size, loader, packer_config.loader_infos_size);
+        memcpy(new_section_data + old_section_size, loader, packer_config.loader_size);
     }
     else {
         size_t new_section_data_size = ((t_elf64 *)elf)->section_header[section_index].sh_size;

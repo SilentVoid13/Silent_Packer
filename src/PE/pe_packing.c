@@ -28,13 +28,13 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *output) {
 
     log_info("Encrypting .text section ...");
     if(encrypt_pe(pe) == -1) {
-        log_error("Error during ELF encryption");
+        log_error("Error during PE encryption");
         return -1;
     }
 
     log_info("Packing using specified method ...");
     if(pe_pack_using_method(pe) == -1) {
-        log_error("Error during ELF packing");
+        log_error("Error during PE packing");
         return -1;
     }
 
@@ -46,7 +46,7 @@ int pack_pe(char *file, char *file_data, size_t file_data_size, char *output) {
 
     log_info("Writing Packed PE to file ...");
     if(write_pe(pe, filename) == -1) {
-        log_error("Error during new ELF writing");
+        log_error("Error during new PE writing");
         return -1;
     }
 

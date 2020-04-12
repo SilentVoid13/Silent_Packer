@@ -40,7 +40,7 @@ char * patch_loader() {
         memcpy(loader, packer_config.loader_stub, packer_config.loader_size);
 
         if(strcmp(packer_config.cipher, "aes128_ecb") == 0) {
-            memcpy(loader + packer_config.loader_size - CIPHER_KEY_OFFSET32_AES, &cipher_key128, 16);
+            memcpy(loader + packer_config.loader_size - CIPHER_KEY_OFFSET32_AES, cipher_key128, 16);
         }
         else {
             memcpy(loader + packer_config.loader_size - CIPHER_KEY_OFFSET32, &cipher_key32, sizeof(uint32_t));

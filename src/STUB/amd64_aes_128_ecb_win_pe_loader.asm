@@ -20,23 +20,16 @@
 
 [BITS 64]
 
-; Linux AMD64 calling convention
-%define arg_0 rdi
-%define arg_1 rsi
-%define arg_2 rdx
-%define arg_3 rcx
-
-
 aes_128_ecb_decrypt:
 	pushfq
 	pushx rax, rdi, rsi, rsp, rdx, rcx
 
-    ; sys_write
-    mov rax, 1
-	mov	rdi, rax
-	lea	rsi, [rel msg]
-	mov	rdx, msg_len
-	syscall
+    ; syscall on windows seems like a pain
+    ;mov rax, 1
+	;mov	rdi, rax
+	;lea	rsi, [rel msg]
+	;mov	rdx, msg_len
+	;syscall
 
     ; We save pie offset
     lea r12, [rel aes_128_ecb_decrypt]
@@ -67,6 +60,7 @@ start_unpacking:
 
     ; For later
     mov rdx, [rel info_size]
+
     ; Move the key in xmm0 to backup
     movdqu xmm0, xmm1
 

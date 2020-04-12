@@ -33,7 +33,7 @@ int encrypt_elf(t_elf *elf) {
         FILE *dump;
         if(packer_config.debug_mode) {
             log_debug("Dumping .text ...");
-            dump = fopen("text32.dmdddf", "w");
+            dump = fopen("text32.dmp", "w");
             fwrite(text_data, text_data_size32, 1, dump);
             fclose(dump);
         }
@@ -62,7 +62,7 @@ int encrypt_elf(t_elf *elf) {
 
         if(packer_config.debug_mode) {
             log_debug("Dumping encrypted .text ...");
-            dump = fopen("text_encrypted32.dmp", "w");
+            dump = fopen("text32_encrypted.dmp", "w");
             fwrite(text_data, text_data_size32, 1, dump);
             fclose(dump);
         }
@@ -106,7 +106,7 @@ int encrypt_elf(t_elf *elf) {
 
         if(packer_config.debug_mode) {
             log_debug("Dumping encrypted .text ...");
-            dump = fopen("text_encrypted64.dmp", "w");
+            dump = fopen("text64_encrypted.dmp", "w");
             fwrite(text_data, text_data_size64, 1, dump);
             fclose(dump);
         }

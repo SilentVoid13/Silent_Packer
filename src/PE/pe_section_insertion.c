@@ -58,7 +58,12 @@ int add_new_pe_section_header(t_pe *pe) {
                                         ((t_pe32 *)pe)->section_header[sections_count - 1].SizeOfRawData;
 
         new_header.Misc.VirtualSize = packer_config.loader_size;
-        new_header.SizeOfRawData = ((t_pe32 *)pe)->pe_header->OptionalHeader.FileAlignment;
+        // TO SEE
+        size_t raw_data_size = 0;
+        while(raw_data_size < packer_config.loader_size) {
+            raw_data_size += ((t_pe32 *)pe)->pe_header->OptionalHeader.FileAlignment;
+        }
+        new_header.SizeOfRawData = raw_data_size;
 
         new_header.Characteristics = IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_CNT_CODE; // NOLINT(hicpp-signed-bitwise)
 
@@ -72,7 +77,13 @@ int add_new_pe_section_header(t_pe *pe) {
                                         ((t_pe64 *)pe)->section_header[sections_count - 1].SizeOfRawData;
 
         new_header.Misc.VirtualSize = packer_config.loader_size;
-        new_header.SizeOfRawData = ((t_pe64 *)pe)->pe_header->OptionalHeader.FileAlignment;
+
+        // TO SEE
+        size_t raw_data_size = 0;
+        while(raw_data_size < packer_config.loader_size) {
+            raw_data_size += ((t_pe64 *)pe)->pe_header->OptionalHeader.FileAlignment;
+        }
+        new_header.SizeOfRawData = raw_data_size;
 
         new_header.Characteristics = IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_CNT_CODE; // NOLINT(hicpp-signed-bitwise)
 

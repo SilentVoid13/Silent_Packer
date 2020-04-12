@@ -5,7 +5,7 @@
 - [x] Add PIE support
     - Probably my nasm loader that needs to be changed
 - [ ] Add new ciphers
-    - [ ] AES
+    - [x] AES
 - [x] Add PE Support
 - [ ] Clean code
 - [ ] Add mprotect in loader
@@ -73,6 +73,6 @@ s_elf struct :
 
 ## AES
 
-- [ ] Add AES-128-ECB support for PE32, PE32+, ELF32
+- [x] Add AES-128-ECB support for PE32, PE32+, ELF32
 - [ ] Add AES-128-CBC
 - [ ] Add AES-256
