@@ -16,6 +16,7 @@
 - [x] Add submodule warning in makefile
 - [ ] Add possibility to add a custom stub (no encryption just executing stub before jumping to main)
 - [ ] Add more packing methods
+- [ ] Change stub message
 
 ## ELF
 
