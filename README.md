@@ -4,8 +4,6 @@ Silent_Packer is an ELF / PE packer written in pure C.
 
 This program can be used to obfuscate a binary. This packer supports PIE binaries.
 
-My code is surely not perfect, do not hesitate to make pull requests or to contact me for any problems / code enhancement suggestion at [silentvoid13@protonmail.com](mailto:silentvoid13@protonmail.com).
-
 ## License
 
 Silent_Packer is licensed under the GNU AGPLv3 license. Refer to [LICENSE](https://github.com/SilentVoid13/Silent_Packer/blob/master/LICENSE.txt) for more informations.
