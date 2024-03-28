@@ -33,3 +33,7 @@ cmake-*
 cmake_install.cmake
 CMakeFiles
 CMakeCache.txt
+
+# nix related files
+.direnv
+.envrc

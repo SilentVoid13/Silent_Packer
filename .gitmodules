@@ -1,3 +1,6 @@
 [submodule "src/utilities/Silent_Log"]
 	path = src/utilities/Silent_Log
 	url = https://github.com/SilentVoid13/Silent_Log.git
+[submodule "extern/argtable3"]
+	path = extern/argtable3
+	url = git@github.com:argtable/argtable3.git
