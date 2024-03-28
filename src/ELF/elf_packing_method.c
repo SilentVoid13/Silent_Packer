@@ -13,8 +13,6 @@
 
 #include "log.h"
 
-struct method_config method_config;
-
 int elf_pack_using_method(t_elf *elf) {
     if(strcmp(packer_config.packing_method, "section_insertion") == 0) {
         method_config.method_type = SECTION_INSERTION_METHOD;

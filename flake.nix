@@ -1,5 +1,5 @@
 {
-  description = "Silent_Pass";
+  description = "Silent_Packer";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";

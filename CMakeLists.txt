@@ -27,11 +27,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/utilities/Silent_Log/log.c")
-    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
-endif()
-
-
 ### NASM management ###
 enable_language(ASM_NASM)
 if(CMAKE_ASM_NASM_COMPILER_LOADED)
@@ -46,8 +41,6 @@ if(CMAKE_ASM_NASM_COMPILER_LOADED)
     file(GLOB_RECURSE ENGINE_ASM_FILES "src/engine/*.asm")
     set(ENGINE_SOURCES ${ENGINE_SOURCES} ${ENGINE_ASM_FILES})
 endif(CMAKE_ASM_NASM_COMPILER_LOADED)
-
-
 
 ### Includes ###
 include_directories(includes)
@@ -75,10 +68,10 @@ set(SOURCES ${SOURCES} ${COMMON_SOURCES} ${ASSEMBLY_SOURCES})
 add_executable(Silent_Packer ${SOURCES})
 install(TARGETS Silent_Packer DESTINATION bin)
 
-### Libs ###
+### External libs ###
 
-### Static common libs ###
-set(ARGTABLE_SOURCES lib/src/argtable3.c)
-add_library(argtable3 STATIC ${ARGTABLE_SOURCES})
+option(ARGTABLE3_ENABLE_TESTS OFF)
+option(ARGTABLE3_ENABLE_EXAMPLES OFF)
+add_subdirectory("extern/argtable3")
 
 target_link_libraries(Silent_Packer argtable3 pthread m)

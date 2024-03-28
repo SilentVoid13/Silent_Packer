@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "main.h"
+#include "packing_method.h"
 #include "elf_packing.h"
 #include "pe_packing.h"
 #include "file_functions.h"
@@ -9,6 +10,8 @@
 
 #include "argtable3.h"
 #include "log.h"
+
+struct method_config method_config;
 
 struct arg_lit *verb, *help, *version, *debug;
 struct arg_str *cipher, *packing_method;
